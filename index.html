@@ -156,12 +156,7 @@ td input:focus{background:var(--color-background-info);}
     <div class="info-box" id="autoLoadMsg"></div>
   </div>
 
-  <div id="lookupNoData" class="no-data">
-    <i class="ti ti-file-arrow-left" aria-hidden="true"></i>
-    <p>JSON을 자동 로드 중이거나<br>설정 탭에서 URL을 지정하세요</p>
-  </div>
-
-  <div id="lookupMain" style="display:none">
+  <div id="lookupMain">
     <div class="stat-row">
       <div class="stat"><div class="n" id="statTotal">0</div><div class="l">전체 등록</div></div>
       <div class="stat"><div class="n" id="statTroll" style="color:var(--color-text-danger)">0</div><div class="l">트롤 수</div></div>
@@ -271,9 +266,7 @@ async function autoLoad() {
     msg.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i> 자동 로드 완료: ' + esc(url);
     document.getElementById('urlInput').value = url;
   } catch(e) {
-    msg.innerHTML = '<i class="ti ti-alert-triangle" aria-hidden="true"></i> 자동 로드 실패 (' + esc(e.message) + ') — 설정 탭에서 URL을 확인하거나 파일을 직접 업로드하세요';
-    msg.style.background = 'var(--color-background-danger)';
-    msg.style.color = 'var(--color-text-danger)';
+    banner.style.display = 'none';
   }
 }
 
@@ -332,8 +325,6 @@ function loadFile(e) {
 function applyData(parsed, src) {
   if (!Array.isArray(parsed)) throw new Error('배열 형식이 아닙니다');
   data = parsed.map(item => ({id: String(item.id||'').trim(), memo: item.memo||''}));
-  document.getElementById('lookupNoData').style.display = 'none';
-  document.getElementById('lookupMain').style.display = 'block';
   document.getElementById('statSrc').textContent = src;
   updateStats();
   renderList();
