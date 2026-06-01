@@ -47,7 +47,7 @@ body {
   padding: 1.5rem 1rem;
 }
 
-input, button, select {
+input, button:not(.del-btn), select {
   background: var(--color-background-secondary);
   color: var(--color-text-primary);
   border: 0.5px solid var(--color-border-secondary);
@@ -62,7 +62,7 @@ input:focus {
   border-color: var(--color-border-primary);
   background: var(--color-background-tertiary);
 }
-button {
+button:not(.del-btn) {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -71,7 +71,7 @@ button {
   font-weight: 500;
   white-space: nowrap;
 }
-button:hover {
+button:not(.del-btn):hover {
   background: var(--color-background-tertiary);
   border-color: var(--color-border-primary);
 }
@@ -120,8 +120,9 @@ tr.drag-over td{border-top:2px solid #378ADD;}
 td input{width:100%;background:transparent;border:none;outline:none;font-size:13px;font-family:var(--font-sans);color:var(--color-text-primary);padding:7px 10px;height:34px;}
 td input:focus{background:var(--color-background-info);}
 .drag-handle{cursor:grab;color:var(--color-text-secondary);font-size:14px;padding:7px 6px 7px 10px;display:flex;align-items:center;}
-.del-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:7px 10px;font-size:14px;display:flex;align-items:center;}
-.del-btn:hover{color:var(--color-text-danger);}
+.del-btn{background:transparent !important;border:none !important;cursor:pointer;color:#ff7070 !important;padding:7px 10px;font-size:16px;display:inline-flex;align-items:center;justify-content:center;min-width:36px;border-radius:var(--border-radius-sm);}
+.del-btn:hover{background:var(--color-background-danger) !important;}
+.del-btn i::before { content: "✕"; font-family: var(--font-sans); font-size: 14px; font-style: normal; }
 .toolbar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
 .toolbar input{flex:1;min-width:120px;}
 .empty-msg{text-align:center;padding:2rem;font-size:14px;color:var(--color-text-secondary);}
@@ -134,6 +135,11 @@ td input:focus{background:var(--color-background-info);}
 .no-data i{font-size:32px;color:var(--color-text-secondary);}
 .no-data p{font-size:14px;color:var(--color-text-secondary);margin-top:8px;}
 .info-box{background:var(--color-background-info);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-info);margin-bottom:1rem;line-height:1.6;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;z-index:9999;white-space:nowrap;}
+.toast-show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast-success{background:var(--color-background-success);color:var(--color-text-success);border:0.5px solid var(--color-text-success);}
+.toast-danger{background:var(--color-background-danger);color:var(--color-text-danger);border:0.5px solid var(--color-text-danger);}
+.toast-info{background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-text-info);}
 </style>
 
 <div class="wrap">
@@ -188,11 +194,17 @@ td input:focus{background:var(--color-background-info);}
     </div>
     <div class="tbl-wrap">
       <table>
+        <colgroup>
+          <col style="width:44px">
+          <col style="width:38%">
+          <col>
+          <col style="width:48px">
+        </colgroup>
         <thead><tr>
-          <th style="width:36px"></th>
-          <th style="width:40%">아이디</th>
+          <th></th>
+          <th>아이디</th>
           <th>메모</th>
-          <th style="width:36px"></th>
+          <th></th>
         </tr></thead>
         <tbody id="editTbody"></tbody>
       </table>
@@ -272,6 +284,10 @@ async function autoLoad() {
 async function fetchFromUrl() {
   const url = document.getElementById('urlInput').value.trim();
   if (!url) return;
+  if (data.length > 0) {
+    const ok = confirm(`기존 데이터 ${data.length}개가 삭제되고 새 파일로 교체됩니다.\n계속하시겠습니까?`);
+    if (!ok) return;
+  }
   const st = document.getElementById('urlStatus');
   st.style.display = 'inline-flex';
   st.className = 'url-status us-loading';
@@ -283,15 +299,21 @@ async function fetchFromUrl() {
     applyData(parsed, urlLabel(url));
     st.className = 'url-status us-ok';
     st.textContent = '완료 (' + data.length + '개)';
+    toast('URL에서 ' + data.length + '개 로드됨', 'success');
   } catch(e) {
     st.className = 'url-status us-err';
     st.textContent = '실패: ' + e.message;
+    toast('로드 실패: ' + e.message, 'danger');
   }
 }
 
 function loadFile(e) {
   const file = e.target.files[0];
   if (!file) return;
+  if (data.length > 0) {
+    const ok = confirm(`기존 데이터 ${data.length}개가 삭제되고 새 파일로 교체됩니다.\n계속하시겠습니까?`);
+    if (!ok) { e.target.value = ''; return; }
+  }
   const reader = new FileReader();
   reader.onload = function(ev) {
     try {
@@ -301,8 +323,11 @@ function loadFile(e) {
       document.getElementById('upIcon').innerHTML = '<i class="ti ti-circle-check" aria-hidden="true" style="color:var(--color-text-success)"></i>';
       document.getElementById('upTitle').textContent = file.name;
       document.getElementById('upSub').textContent = data.length + '개 항목 로드됨';
+      e.target.value = '';
+      toast(`${file.name} — ${data.length}개 로드됨`, 'success');
     } catch(err) {
       document.getElementById('upTitle').textContent = '오류: ' + err.message;
+      toast('파일 오류: ' + err.message, 'danger');
     }
   };
   reader.readAsText(file);
@@ -318,6 +343,7 @@ function applyData(parsed, src) {
   document.getElementById('statSrc').textContent = src;
   updateStats();
   renderList();
+  renderEditTable();
 }
 
 function urlLabel(url) {
@@ -367,7 +393,6 @@ function listItemHTML(item) {
 }
 
 function renderEditTable() {
-  if (!data.length && document.getElementById('editMain').style.display==='none') return;
   const tbody = document.getElementById('editTbody');
   tbody.innerHTML = '';
   data.forEach((item, idx) => {
@@ -387,12 +412,20 @@ function updateCell(idx, field, val) { data[idx][field]=val; updateStats(); rend
 function addRow() {
   const idVal = document.getElementById('newId').value.trim();
   if (!idVal) { document.getElementById('newId').focus(); return; }
-  data.push({id:idVal, memo:document.getElementById('newMemo').value.trim()});
+  const memoVal = document.getElementById('newMemo').value.trim();
+  const existing = data.findIndex(d => d.id === idVal);
+  if (existing !== -1) {
+    data[existing].memo = memoVal;
+    toast(`"${idVal}" 덮어씀`, 'info');
+  } else {
+    data.push({id:idVal, memo:memoVal});
+    toast(`"${idVal}" 추가됨`, 'success');
+  }
   document.getElementById('newId').value='';
   document.getElementById('newMemo').value='';
   updateStats(); renderList(); renderEditTable();
 }
-function deleteRow(idx) { data.splice(idx,1); updateStats(); renderList(); renderEditTable(); }
+function deleteRow(idx) { const id = data[idx].id; if (!confirm(`"${id}" 를 삭제할까요?`)) return; data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`, 'danger'); }
 function saveJSON() {
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a = document.createElement('a');
@@ -405,6 +438,15 @@ function onDrop(e) { e.preventDefault(); if(this===dragSrc) return; const f=pars
 function onDragEnd() { document.querySelectorAll('tr.dragging,tr.drag-over').forEach(r=>{r.classList.remove('dragging');r.classList.remove('drag-over');}); dragSrc=null; }
 
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('toast-show'));
+  setTimeout(() => { el.classList.remove('toast-show'); setTimeout(() => el.remove(), 300); }, 2500);
+}
 
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Escape')clearSearch();});
 document.getElementById('newId').addEventListener('keydown',e=>{if(e.key==='Enter')addRow();});
