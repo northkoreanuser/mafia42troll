@@ -181,11 +181,7 @@ td input:focus{background:var(--color-background-info);}
 </div>
 
 <div id="panel-edit" class="panel">
-  <div id="editNoData" class="no-data">
-    <i class="ti ti-file-arrow-left" aria-hidden="true"></i>
-    <p>데이터를 먼저 불러오세요</p>
-  </div>
-  <div id="editMain" style="display:none">
+  <div id="editMain" style="display:block">
     <div class="toolbar">
       <input type="text" id="newId" placeholder="새 아이디" style="max-width:160px">
       <input type="text" id="newMemo" placeholder="메모 (선택)" style="max-width:200px">
@@ -338,8 +334,6 @@ function applyData(parsed, src) {
   data = parsed.map(item => ({id: String(item.id||'').trim(), memo: item.memo||''}));
   document.getElementById('lookupNoData').style.display = 'none';
   document.getElementById('lookupMain').style.display = 'block';
-  document.getElementById('editNoData').style.display = 'none';
-  document.getElementById('editMain').style.display = 'block';
   document.getElementById('statSrc').textContent = src;
   updateStats();
   renderList();
