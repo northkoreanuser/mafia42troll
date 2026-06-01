@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>트롤 체커</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/tabler-icons.min.css">
+<style>
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+
+  /* Dark mode palette */
+  --color-background-primary:   #1a1b1e;
+  --color-background-secondary: #25262b;
+  --color-background-tertiary:  #2c2e33;
+  --color-background-info:      #1c2a3a;
+  --color-background-success:   #1a2e22;
+  --color-background-danger:    #2e1a1a;
+  --color-background-warning:   #2e2519;
+
+  --color-border-primary:   #4a4d57;
+  --color-border-secondary: #3a3d47;
+  --color-border-tertiary:  #2e3138;
+
+  --color-text-primary:   #e8eaf0;
+  --color-text-secondary: #9099ad;
+  --color-text-tertiary:  #5c6478;
+  --color-text-info:      #6bbdff;
+  --color-text-success:   #5dd98a;
+  --color-text-danger:    #ff7070;
+  --color-text-warning:   #ffb347;
+}
+
+html, body {
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+}
+
+body {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+input, button, select {
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 7px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+input:focus {
+  border-color: var(--color-border-primary);
+  background: var(--color-background-tertiary);
+}
+button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+button:hover {
+  background: var(--color-background-tertiary);
+  border-color: var(--color-border-primary);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+.wrap{padding:1.5rem 0;font-family:var(--font-sans);}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--color-border-tertiary);margin-bottom:1.5rem;}
+.tab{padding:8px 20px;font-size:14px;cursor:pointer;border:0.5px solid transparent;border-bottom:none;border-radius:var(--border-radius-md) var(--border-radius-md) 0 0;color:var(--color-text-secondary);background:transparent;transition:all 0.15s;position:relative;bottom:-1px;}
+.tab.active{background:var(--color-background-primary);border-color:var(--color-border-tertiary);color:var(--color-text-primary);font-weight:500;}
+.tab:hover:not(.active){color:var(--color-text-primary);}
+.panel{display:none;}.panel.active{display:block;}
+.upload-area{border:1.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:1.5rem;text-align:center;cursor:pointer;background:var(--color-background-secondary);margin-bottom:1.5rem;transition:background 0.15s;}
+.upload-area:hover{background:var(--color-background-tertiary);}
+.upload-area.loaded{border-style:solid;border-color:var(--color-border-primary);}
+.url-bar{display:flex;gap:8px;margin-bottom:1rem;align-items:center;}
+.url-bar input{flex:1;font-size:13px;font-family:var(--font-mono);}
+.url-status{font-size:12px;padding:4px 10px;border-radius:99px;font-weight:500;white-space:nowrap;}
+.us-ok{background:var(--color-background-success);color:var(--color-text-success);}
+.us-err{background:var(--color-background-danger);color:var(--color-text-danger);}
+.us-loading{background:var(--color-background-warning);color:var(--color-text-warning);}
+.divider{display:flex;align-items:center;gap:8px;margin:1rem 0;font-size:12px;color:var(--color-text-secondary);}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary);}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.5rem;}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;}
+.stat .n{font-size:22px;font-weight:500;color:var(--color-text-primary);}
+.stat .l{font-size:12px;color:var(--color-text-secondary);margin-top:2px;}
+.search-row{display:flex;gap:8px;margin-bottom:1rem;}
+.search-row input{flex:1;}
+.result-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:12px;}
+.r-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.icon-troll{background:var(--color-background-danger);color:var(--color-text-danger);}
+.icon-clean{background:var(--color-background-success);color:var(--color-text-success);}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:500;}
+.bd{background:var(--color-background-danger);color:var(--color-text-danger);}
+.bs{background:var(--color-background-success);color:var(--color-text-success);}
+.r-id{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px;}
+.r-memo{font-size:13px;color:var(--color-text-secondary);}
+.tbl-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem;}
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
+thead tr{background:var(--color-background-secondary);}
+th{padding:9px 10px;text-align:left;font-weight:500;color:var(--color-text-secondary);font-size:12px;border-bottom:0.5px solid var(--color-border-tertiary);}
+td{padding:0;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr.dragging{opacity:0.4;}
+tr.drag-over td{border-top:2px solid #378ADD;}
+td input{width:100%;background:transparent;border:none;outline:none;font-size:13px;font-family:var(--font-sans);color:var(--color-text-primary);padding:7px 10px;height:34px;}
+td input:focus{background:var(--color-background-info);}
+.drag-handle{cursor:grab;color:var(--color-text-secondary);font-size:14px;padding:7px 6px 7px 10px;display:flex;align-items:center;}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:7px 10px;font-size:14px;display:flex;align-items:center;}
+.del-btn:hover{color:var(--color-text-danger);}
+.toolbar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
+.toolbar input{flex:1;min-width:120px;}
+.empty-msg{text-align:center;padding:2rem;font-size:14px;color:var(--color-text-secondary);}
+.section-label{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;}
+.list-wrap .list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:14px;}
+.list-item:last-child{border-bottom:none;}
+.list-id{flex:1;color:var(--color-text-primary);font-weight:500;}
+.list-memo{flex:2;color:var(--color-text-secondary);font-size:13px;}
+.no-data{text-align:center;padding:3rem 0;}
+.no-data i{font-size:32px;color:var(--color-text-secondary);}
+.no-data p{font-size:14px;color:var(--color-text-secondary);margin-top:8px;}
+.info-box{background:var(--color-background-info);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-info);margin-bottom:1rem;line-height:1.6;}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">트롤 조회 및 관리</h2>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('lookup')"><i class="ti ti-search" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>조회</button>
+  <button class="tab" onclick="switchTab('edit')"><i class="ti ti-table" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>편집</button>
+  <button class="tab" onclick="switchTab('settings')"><i class="ti ti-settings" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>설정</button>
+</div>
+
+<div id="panel-lookup" class="panel active">
+  <div id="autoLoadBanner" style="display:none;margin-bottom:1rem;">
+    <div class="info-box" id="autoLoadMsg"></div>
+  </div>
+
+  <div id="lookupNoData" class="no-data">
+    <i class="ti ti-file-arrow-left" aria-hidden="true"></i>
+    <p>JSON을 자동 로드 중이거나<br>설정 탭에서 URL을 지정하세요</p>
+  </div>
+
+  <div id="lookupMain" style="display:none">
+    <div class="stat-row">
+      <div class="stat"><div class="n" id="statTotal">0</div><div class="l">전체 등록</div></div>
+      <div class="stat"><div class="n" id="statTroll" style="color:var(--color-text-danger)">0</div><div class="l">트롤 수</div></div>
+      <div class="stat"><div class="n" id="statSrc" style="font-size:13px;margin-top:4px">-</div><div class="l">데이터 출처</div></div>
+    </div>
+    <div class="section-label">아이디 조회</div>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="조회할 아이디 입력" oninput="doSearch()">
+      <button onclick="clearSearch()"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div id="searchResult"></div>
+    <div id="listSection">
+      <div class="section-label">전체 목록</div>
+      <div class="list-wrap" id="listWrap"></div>
+    </div>
+  </div>
+</div>
+
+<div id="panel-edit" class="panel">
+  <div id="editNoData" class="no-data">
+    <i class="ti ti-file-arrow-left" aria-hidden="true"></i>
+    <p>데이터를 먼저 불러오세요</p>
+  </div>
+  <div id="editMain" style="display:none">
+    <div class="toolbar">
+      <input type="text" id="newId" placeholder="새 아이디" style="max-width:160px">
+      <input type="text" id="newMemo" placeholder="메모 (선택)" style="max-width:200px">
+      <button onclick="addRow()"><i class="ti ti-plus" aria-hidden="true"></i> 추가</button>
+      <button onclick="saveJSON()" style="margin-left:auto"><i class="ti ti-download" aria-hidden="true"></i> JSON 저장</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:36px"></th>
+          <th style="width:40%">아이디</th>
+          <th>메모</th>
+          <th style="width:36px"></th>
+        </tr></thead>
+        <tbody id="editTbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-secondary)"><i class="ti ti-grip-vertical" aria-hidden="true" style="font-size:12px"></i> 드래그로 순서 변경 &nbsp;·&nbsp; 셀 클릭으로 직접 편집</div>
+  </div>
+</div>
+
+<div id="panel-settings" class="panel">
+  <div class="info-box">
+    아래 URL에 JSON 파일이 있으면 페이지 로드 시 자동으로 불러옵니다.<br>
+    CORS가 허용된 주소여야 합니다 (GitHub Pages, raw.githubusercontent.com 등).
+  </div>
+
+  <div class="section-label">JSON 데이터 URL</div>
+  <div class="url-bar" style="margin-bottom:0.5rem">
+    <input type="text" id="urlInput" placeholder="https://example.github.io/trolls.json" style="font-family:var(--font-mono);font-size:13px">
+    <button onclick="fetchFromUrl()"><i class="ti ti-refresh" aria-hidden="true"></i> 불러오기</button>
+    <span id="urlStatus" style="display:none" class="url-status"></span>
+  </div>
+  <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:1.5rem">
+    상대 경로도 가능: <code style="font-family:var(--font-mono);background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">/trolls.json</code> &nbsp;또는&nbsp; <code style="font-family:var(--font-mono);background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">./data/trolls.json</code>
+  </div>
+
+  <div class="divider">또는 파일 직접 업로드</div>
+
+  <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()" style="margin-bottom:0">
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
+    <div id="upIcon" style="font-size:24px;color:var(--color-text-secondary);margin-bottom:6px"><i class="ti ti-file-upload" aria-hidden="true"></i></div>
+    <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px" id="upTitle">클릭하여 JSON 파일 선택</div>
+    <div style="font-size:12px;color:var(--color-text-secondary)" id="upSub">[{"id":"...","memo":"..."}] 배열 형식</div>
+  </div>
+</div>
+</div>
+
+<script>
+// ─── 하드코딩된 기본 URL ───────────────────────────────────────────
+// 여기를 수정하세요. 비워두면 자동 로드를 시도하지 않습니다.
+const DEFAULT_JSON_URL = 'troll_list.json';
+// 예시:
+// const DEFAULT_JSON_URL = 'https://yourname.github.io/troll-list/trolls.json';
+// const DEFAULT_JSON_URL = '/trolls.json';
+// const DEFAULT_JSON_URL = './data/trolls.json';
+// ──────────────────────────────────────────────────────────────────
+
+let data = [];
+let dragSrc = null;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['lookup','edit','settings'][i]===name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if (name==='edit') renderEditTable();
+}
+
+async function autoLoad() {
+  const url = DEFAULT_JSON_URL.trim();
+  if (!url) return;
+  const banner = document.getElementById('autoLoadBanner');
+  const msg = document.getElementById('autoLoadMsg');
+  banner.style.display = 'block';
+  msg.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> ' + esc(url) + ' 에서 불러오는 중...';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const parsed = await res.json();
+    applyData(parsed, urlLabel(url));
+    msg.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i> 자동 로드 완료: ' + esc(url);
+    document.getElementById('urlInput').value = url;
+  } catch(e) {
+    msg.innerHTML = '<i class="ti ti-alert-triangle" aria-hidden="true"></i> 자동 로드 실패 (' + esc(e.message) + ') — 설정 탭에서 URL을 확인하거나 파일을 직접 업로드하세요';
+    msg.style.background = 'var(--color-background-danger)';
+    msg.style.color = 'var(--color-text-danger)';
+  }
+}
+
+async function fetchFromUrl() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+  const st = document.getElementById('urlStatus');
+  st.style.display = 'inline-flex';
+  st.className = 'url-status us-loading';
+  st.textContent = '로드 중...';
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const parsed = await res.json();
+    applyData(parsed, urlLabel(url));
+    st.className = 'url-status us-ok';
+    st.textContent = '완료 (' + data.length + '개)';
+  } catch(e) {
+    st.className = 'url-status us-err';
+    st.textContent = '실패: ' + e.message;
+  }
+}
+
+function loadFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      applyData(parsed, file.name);
+      document.getElementById('uploadArea').classList.add('loaded');
+      document.getElementById('upIcon').innerHTML = '<i class="ti ti-circle-check" aria-hidden="true" style="color:var(--color-text-success)"></i>';
+      document.getElementById('upTitle').textContent = file.name;
+      document.getElementById('upSub').textContent = data.length + '개 항목 로드됨';
+    } catch(err) {
+      document.getElementById('upTitle').textContent = '오류: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function applyData(parsed, src) {
+  if (!Array.isArray(parsed)) throw new Error('배열 형식이 아닙니다');
+  data = parsed.map(item => ({id: String(item.id||'').trim(), memo: item.memo||''}));
+  document.getElementById('lookupNoData').style.display = 'none';
+  document.getElementById('lookupMain').style.display = 'block';
+  document.getElementById('editNoData').style.display = 'none';
+  document.getElementById('editMain').style.display = 'block';
+  document.getElementById('statSrc').textContent = src;
+  updateStats();
+  renderList();
+}
+
+function urlLabel(url) {
+  try { return new URL(url, location.href).hostname || url; } catch { return url; }
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = data.length;
+  document.getElementById('statTroll').textContent = data.length;
+}
+
+function trollMap() {
+  const m = {};
+  data.forEach(item => { if (item.id) m[item.id] = item.memo; });
+  return m;
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  const resultEl = document.getElementById('searchResult');
+  const listSection = document.getElementById('listSection');
+  if (!q) { resultEl.innerHTML=''; listSection.style.display='block'; return; }
+  listSection.style.display='none';
+  const map = trollMap();
+  if (map.hasOwnProperty(q)) {
+    const memo = map[q];
+    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div></div></div>`;
+  } else {
+    const similar = data.filter(i => i.id && i.id.toLowerCase().includes(q.toLowerCase()) && i.id!==q);
+    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
+  }
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchResult').innerHTML='';
+  document.getElementById('listSection').style.display='block';
+}
+
+function renderList() {
+  const el = document.getElementById('listWrap');
+  el.innerHTML = data.length ? data.map(listItemHTML).join('') : '<div class="empty-msg">항목 없음</div>';
+}
+
+function listItemHTML(item) {
+  return `<div class="list-item"><i class="ti ti-ban" aria-hidden="true" style="font-size:15px;color:var(--color-text-danger);flex-shrink:0"></i><span class="list-id">${esc(item.id)}</span><span class="list-memo">${item.memo?esc(item.memo):'<span style="color:var(--color-text-tertiary)">메모 없음</span>'}</span></div>`;
+}
+
+function renderEditTable() {
+  if (!data.length && document.getElementById('editMain').style.display==='none') return;
+  const tbody = document.getElementById('editTbody');
+  tbody.innerHTML = '';
+  data.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    tr.dataset.idx = idx;
+    tr.draggable = true;
+    tr.innerHTML = `<td><div class="drag-handle"><i class="ti ti-grip-vertical" aria-hidden="true"></i></div></td><td><input type="text" value="${esc(item.id)}" placeholder="아이디" oninput="updateCell(${idx},'id',this.value)"></td><td><input type="text" value="${esc(item.memo)}" placeholder="메모 없음" oninput="updateCell(${idx},'memo',this.value)"></td><td><button class="del-btn" onclick="deleteRow(${idx})" aria-label="삭제"><i class="ti ti-trash" aria-hidden="true"></i></button></td>`;
+    tr.addEventListener('dragstart', onDragStart);
+    tr.addEventListener('dragover', onDragOver);
+    tr.addEventListener('drop', onDrop);
+    tr.addEventListener('dragend', onDragEnd);
+    tbody.appendChild(tr);
+  });
+}
+
+function updateCell(idx, field, val) { data[idx][field]=val; updateStats(); renderList(); }
+function addRow() {
+  const idVal = document.getElementById('newId').value.trim();
+  if (!idVal) { document.getElementById('newId').focus(); return; }
+  data.push({id:idVal, memo:document.getElementById('newMemo').value.trim()});
+  document.getElementById('newId').value='';
+  document.getElementById('newMemo').value='';
+  updateStats(); renderList(); renderEditTable();
+}
+function deleteRow(idx) { data.splice(idx,1); updateStats(); renderList(); renderEditTable(); }
+function saveJSON() {
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download='troll_list.json'; a.click();
+}
+
+function onDragStart(e) { dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('tr.drag-over').forEach(r=>r.classList.remove('drag-over')); if(this!==dragSrc) this.classList.add('drag-over'); }
+function onDrop(e) { e.preventDefault(); if(this===dragSrc) return; const f=parseInt(dragSrc.dataset.idx),t=parseInt(this.dataset.idx); const[m]=data.splice(f,1); data.splice(t,0,m); renderEditTable(); renderList(); }
+function onDragEnd() { document.querySelectorAll('tr.dragging,tr.drag-over').forEach(r=>{r.classList.remove('dragging');r.classList.remove('drag-over');}); dragSrc=null; }
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Escape')clearSearch();});
+document.getElementById('newId').addEventListener('keydown',e=>{if(e.key==='Enter')addRow();});
+
+autoLoad();
+</script>
+</body>
+</html>
