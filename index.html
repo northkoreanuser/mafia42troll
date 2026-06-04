@@ -231,6 +231,21 @@ td input:focus{background:var(--color-background-info);}
 </div>
 </div>
 
+<!-- 편집 권한 확인 모달 -->
+<div id="permModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;">
+  <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-primary);border-radius:var(--border-radius-lg);padding:1.5rem 1.75rem;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.75rem;">
+      <i class="ti ti-lock" style="font-size:20px;color:var(--color-text-warning)"></i>
+      <span style="font-size:15px;font-weight:600;color:var(--color-text-primary)">편집 권한 확인</span>
+    </div>
+    <p id="permModalMsg" style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:1.25rem;"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button id="permCancelBtn">취소</button>
+      <button id="permConfirmBtn" style="background:var(--color-background-warning);border-color:var(--color-text-warning);color:var(--color-text-warning)">권한 있음, 계속</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── 하드코딩된 기본 URL ───────────────────────────────────────────
 // 여기를 수정하세요. 비워두면 자동 로드를 시도하지 않습니다.
@@ -243,6 +258,49 @@ const DEFAULT_JSON_URL = 'troll_list.json';
 
 let data = [];
 let dragSrc = null;
+
+// ─── 편집 권한 확인 ───────────────────────────────────────────────
+const PERM_COOKIE = 'edit_permitted';
+
+function hasPermCookie() {
+  return document.cookie.split(';').some(c => c.trim().startsWith(PERM_COOKIE + '=1'));
+}
+function setPermCookie() {
+  document.cookie = `${PERM_COOKIE}=1;path=/;SameSite=Lax`;
+}
+function clearPermCookie() {
+  document.cookie = `${PERM_COOKIE}=0;path=/;max-age=0`;
+}
+
+let _pendingAction = null;
+let _cancelAction = null;
+
+function requirePerm(action, cancel) {
+  if (hasPermCookie()) { action(); return; }
+  const r = getGithubRepo();
+  const repoStr = r ? `${r.owner}/${r.repo}` : '이 저장소';
+  document.getElementById('permModalMsg').textContent =
+    `${repoStr} 저장소의 편집 권한이 있는 경우에만 변경 사항이 반영됩니다. 계속하시겠습니까?`;
+  const modal = document.getElementById('permModal');
+  modal.style.display = 'flex';
+  _pendingAction = action;
+  _cancelAction = cancel || null;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('permConfirmBtn').addEventListener('click', () => {
+    setPermCookie();
+    document.getElementById('permModal').style.display = 'none';
+    if (_pendingAction) { _pendingAction(); _pendingAction = null; }
+    _cancelAction = null;
+  });
+  document.getElementById('permCancelBtn').addEventListener('click', () => {
+    document.getElementById('permModal').style.display = 'none';
+    if (_cancelAction) { _cancelAction(); _cancelAction = null; }
+    _pendingAction = null;
+  });
+});
+// ──────────────────────────────────────────────────────────────────
 
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['lookup','edit','settings'][i]===name));
@@ -354,8 +412,9 @@ function updateStats() {
 }
 
 function trollMap() {
+  // 키를 소문자로 저장해 대소문자 무관 조회
   const m = {};
-  data.forEach(item => { if (item.id) m[item.id] = item.memo; });
+  data.forEach(item => { if (item.id) m[item.id.toLowerCase()] = { id: item.id, memo: item.memo }; });
   return m;
 }
 
@@ -366,11 +425,12 @@ function doSearch() {
   if (!q) { resultEl.innerHTML=''; listSection.style.display='block'; return; }
   listSection.style.display='none';
   const map = trollMap();
-  if (map.hasOwnProperty(q)) {
-    const memo = map[q];
-    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div></div></div>`;
+  const key = q.toLowerCase();
+  if (map.hasOwnProperty(key)) {
+    const { id: origId, memo } = map[key];
+    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div></div></div>`;
   } else {
-    const similar = data.filter(i => i.id && i.id.toLowerCase().includes(q.toLowerCase()) && i.id!==q);
+    const similar = data.filter(i => i.id && i.id.toLowerCase().includes(key) && i.id.toLowerCase()!==key);
     resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
   }
 }
@@ -406,24 +466,48 @@ function renderEditTable() {
   });
 }
 
-function updateCell(idx, field, val) { data[idx][field]=val; updateStats(); renderList(); }
+function updateCell(idx, field, val) {
+  const prev = data[idx][field];
+  requirePerm(
+    () => { data[idx][field]=val; updateStats(); renderList(); },
+    () => {
+      data[idx][field] = prev;
+      renderEditTable(); // 취소 시 입력값 원래대로 복원
+    }
+  );
+}
 function addRow() {
   const idVal = document.getElementById('newId').value.trim();
   if (!idVal) { document.getElementById('newId').focus(); return; }
   const memoVal = document.getElementById('newMemo').value.trim();
-  const existing = data.findIndex(d => d.id === idVal);
-  if (existing !== -1) {
-    data[existing].memo = memoVal;
-    toast(`"${idVal}" 덮어씀`, 'info');
-  } else {
-    data.push({id:idVal, memo:memoVal});
-    toast(`"${idVal}" 추가됨`, 'success');
-  }
-  document.getElementById('newId').value='';
-  document.getElementById('newMemo').value='';
-  updateStats(); renderList(); renderEditTable();
+  requirePerm(
+    () => {
+      const existing = data.findIndex(d => d.id === idVal);
+      if (existing !== -1) {
+        data[existing].memo = memoVal;
+        toast(`"${idVal}" 덮어씀`, 'info');
+      } else {
+        data.push({id:idVal, memo:memoVal});
+        toast(`"${idVal}" 추가됨`, 'success');
+      }
+      document.getElementById('newId').value='';
+      document.getElementById('newMemo').value='';
+      updateStats(); renderList(); renderEditTable();
+    },
+    () => {
+      // 취소: 입력값 지우기
+      document.getElementById('newId').value='';
+      document.getElementById('newMemo').value='';
+    }
+  );
 }
-function deleteRow(idx) { const id = data[idx].id; if (!confirm(`"${id}" 를 삭제할까요?`)) return; data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`, 'danger'); }
+function deleteRow(idx) {
+  const id = data[idx].id;
+  if (!confirm(`"${id}" 를 삭제할까요?`)) return;
+  requirePerm(
+    () => { data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`, 'danger'); }
+  );
+}
 function getGithubEditUrl() {
   const r = getGithubRepo();
   if (!r) return null;
