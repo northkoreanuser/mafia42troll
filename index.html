@@ -460,7 +460,7 @@ function doSearch() {
       if (!i.id) return false;
       const k = i.id.toLowerCase();
       if (k === key) return false;
-      return k.includes(key) || (i.decomposed && i.decomposed.includes(keyDecomposed));
+      return k.startsWith(key) || (i.decomposed && i.decomposed.startsWith(keyDecomposed));
     });
     resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
   }
