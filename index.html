@@ -380,9 +380,26 @@ function loadFile(e) {
   reader.readAsText(file);
 }
 
+
+// ─── 한글 자모 분리 ────────────────────────────────────────────────
+function decomposeHangul(str) {
+  const CHO  = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+  const JONG  = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  return [...str].map(ch => {
+    const code = ch.charCodeAt(0);
+    if (code < 0xAC00 || code > 0xD7A3) return ch; // 한글 음절 아님
+    const offset = code - 0xAC00;
+    const jong = offset % 28;
+    const jung = ((offset - jong) / 28) % 21;
+    const cho  = Math.floor((offset - jong) / 28 / 21);
+    return CHO[cho] + JUNG[jung] + JONG[jong];
+  }).join('');
+}
+// ──────────────────────────────────────────────────────────────────
 function applyData(parsed, src) {
   if (!Array.isArray(parsed)) throw new Error('배열 형식이 아닙니다');
-  data = parsed.map(item => ({id: String(item.id||'').trim(), memo: item.memo||''}));
+  data = parsed.map(item => { const id = String(item.id||'').trim(); return {id, memo: item.memo||'', decomposed: decomposeHangul(id.toLowerCase())}; });
   document.getElementById('statSrc').innerHTML = src;
   updateStats();
   renderList();
@@ -412,9 +429,15 @@ function updateStats() {
 }
 
 function trollMap() {
-  // 키를 소문자로 저장해 대소문자 무관 조회
+  // 일반 소문자 키 + 자모분리 키 둘 다 등록
   const m = {};
-  data.forEach(item => { if (item.id) m[item.id.toLowerCase()] = { id: item.id, memo: item.memo }; });
+  data.forEach(item => {
+    if (!item.id) return;
+    const k = item.id.toLowerCase();
+    const entry = { id: item.id, memo: item.memo };
+    m[k] = entry;
+    if (item.decomposed && item.decomposed !== k) m[item.decomposed] = entry;
+  });
   return m;
 }
 
@@ -426,20 +449,20 @@ function doSearch() {
   listSection.style.display='none';
   const map = trollMap();
   const key = q.toLowerCase();
-  if (map.hasOwnProperty(key)) {
-    const { id: origId, memo } = map[key];
+  const keyDecomp = decomposeHangul(key);
+  const hitKey = map.hasOwnProperty(key) ? key : map.hasOwnProperty(keyDecomp) ? keyDecomp : null;
+  if (hitKey) {
+    const { id: origId, memo } = map[hitKey];
     resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div></div></div>`;
   } else {
-    const similar = data.filter(i => i.id && i.id.toLowerCase().includes(key) && i.id.toLowerCase()!==key);
-    // 트롤일 확률: 후보가 좁혀질수록 높아짐. 1명이면 100%, 전체에 가까울수록 0%
-    const total = data.filter(i => i.id).length;
-    let probHTML = '';
-    if (similar.length > 0 && total > 0) {
-      const prob = similar.length === 1 ? 100 : Math.round((1 - (similar.length - 1) / (total - 1)) * 100);
-      const probColor = prob >= 80 ? 'var(--color-text-danger)' : prob >= 40 ? 'var(--color-text-warning)' : 'var(--color-text-secondary)';
-      probHTML = `<span style="font-size:12px;color:${probColor};margin-left:8px">트롤 확률 ${prob}%</span>`;
-    }
-    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span>${probHTML}</div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
+    const keyDecomposed = decomposeHangul(key);
+    const similar = data.filter(i => {
+      if (!i.id) return false;
+      const k = i.id.toLowerCase();
+      if (k === key) return false;
+      return k.includes(key) || (i.decomposed && i.decomposed.includes(keyDecomposed));
+    });
+    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
   }
 }
 
@@ -477,7 +500,7 @@ function renderEditTable() {
 function updateCell(idx, field, val) {
   const prev = data[idx][field];
   requirePerm(
-    () => { data[idx][field]=val; updateStats(); renderList(); },
+    () => { data[idx][field]=val; if(field==='id') data[idx].decomposed=decomposeHangul(val.toLowerCase()); updateStats(); renderList(); },
     () => {
       data[idx][field] = prev;
       renderEditTable(); // 취소 시 입력값 원래대로 복원
@@ -495,7 +518,7 @@ function addRow() {
         data[existing].memo = memoVal;
         toast(`"${idVal}" 덮어씀`, 'info');
       } else {
-        data.push({id:idVal, memo:memoVal});
+        data.push({id:idVal, memo:memoVal, decomposed:decomposeHangul(idVal.toLowerCase())});
         toast(`"${idVal}" 추가됨`, 'success');
       }
       document.getElementById('newId').value='';
