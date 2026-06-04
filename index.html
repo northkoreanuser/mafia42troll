@@ -411,16 +411,35 @@ function addRow() {
   updateStats(); renderList(); renderEditTable();
 }
 function deleteRow(idx) { const id = data[idx].id; if (!confirm(`"${id}" 를 삭제할까요?`)) return; data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`, 'danger'); }
+function getGithubEditUrl() {
+  // pages 주소: https://{owner}.github.io/{repo}/...
+  const host = location.hostname; // e.g. northkoreanuser.github.io
+  const m = host.match(/^([^.]+)\.github\.io$/);
+  if (!m) return null;
+  const owner = m[1];
+  // repo: pathname 첫 세그먼트
+  const pathSegs = location.pathname.split('/').filter(Boolean);
+  const repo = pathSegs[0] || null;
+  if (!repo) return null;
+  // 파일 경로: DEFAULT_JSON_URL에서 상대경로 앞 ./ 제거
+  const filePath = DEFAULT_JSON_URL.trim().replace(/^\.?\//, '');
+  return `https://github.com/${owner}/${repo}/edit/main/${filePath}`;
+}
+
 async function saveJSON() {
   const json = JSON.stringify(data, null, 2);
   try {
     await navigator.clipboard.writeText(json);
     toast('클립보드에 복사됨 — GitHub에서 붙여넣기 하세요', 'success');
   } catch(e) {
-    // fallback: show in prompt so user can copy manually
     prompt('아래 JSON을 복사하세요 (Ctrl+A → Ctrl+C):', json);
   }
-  window.open('https://github.com/northkoreanuser/mafia42troll/edit/main/troll_list.json', '_blank');
+  const editUrl = getGithubEditUrl();
+  if (editUrl) {
+    window.open(editUrl, '_blank');
+  } else {
+    toast('GitHub Pages 주소가 아니어서 편집 페이지를 열 수 없습니다', 'danger');
+  }
 }
 
 function onDragStart(e) { dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
