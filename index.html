@@ -181,7 +181,7 @@ td input:focus{background:var(--color-background-info);}
       <input type="text" id="newId" placeholder="새 아이디" style="max-width:160px">
       <input type="text" id="newMemo" placeholder="메모 (선택)" style="max-width:200px">
       <button onclick="addRow()"><i class="ti ti-plus" aria-hidden="true"></i> 추가</button>
-      <button onclick="saveJSON()" style="margin-left:auto"><i class="ti ti-download" aria-hidden="true"></i> JSON 저장</button>
+      <button onclick="saveJSON()" style="margin-left:auto"><i class="ti ti-brand-github" aria-hidden="true"></i> GitHub에 저장</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -411,10 +411,16 @@ function addRow() {
   updateStats(); renderList(); renderEditTable();
 }
 function deleteRow(idx) { const id = data[idx].id; if (!confirm(`"${id}" 를 삭제할까요?`)) return; data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`, 'danger'); }
-function saveJSON() {
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download='troll_list.json'; a.click();
+async function saveJSON() {
+  const json = JSON.stringify(data, null, 2);
+  try {
+    await navigator.clipboard.writeText(json);
+    toast('클립보드에 복사됨 — GitHub에서 붙여넣기 하세요', 'success');
+  } catch(e) {
+    // fallback: show in prompt so user can copy manually
+    prompt('아래 JSON을 복사하세요 (Ctrl+A → Ctrl+C):', json);
+  }
+  window.open('https://github.com/northkoreanuser/mafia42troll/edit/main/troll_list.json', '_blank');
 }
 
 function onDragStart(e) { dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
