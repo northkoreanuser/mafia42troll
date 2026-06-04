@@ -240,8 +240,8 @@ td input:focus{background:var(--color-background-info);}
     </div>
     <p id="permModalMsg" style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:1.25rem;"></p>
     <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button id="permCancelBtn">취소</button>
       <button id="permConfirmBtn" style="background:var(--color-background-warning);border-color:var(--color-text-warning);color:var(--color-text-warning)">권한 있음, 계속</button>
+      <button id="permCancelBtn">취소</button>
     </div>
   </div>
 </div>
@@ -431,7 +431,15 @@ function doSearch() {
     resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div></div></div>`;
   } else {
     const similar = data.filter(i => i.id && i.id.toLowerCase().includes(key) && i.id.toLowerCase()!==key);
-    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
+    // 트롤일 확률: 후보가 좁혀질수록 높아짐. 1명이면 100%, 전체에 가까울수록 0%
+    const total = data.filter(i => i.id).length;
+    let probHTML = '';
+    if (similar.length > 0 && total > 0) {
+      const prob = similar.length === 1 ? 100 : Math.round((1 - (similar.length - 1) / (total - 1)) * 100);
+      const probColor = prob >= 80 ? 'var(--color-text-danger)' : prob >= 40 ? 'var(--color-text-warning)' : 'var(--color-text-secondary)';
+      probHTML = `<span style="font-size:12px;color:${probColor};margin-left:8px">트롤 확률 ${prob}%</span>`;
+    }
+    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span>${probHTML}</div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
   }
 }
 
