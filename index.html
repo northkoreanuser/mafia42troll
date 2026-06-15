@@ -12,7 +12,6 @@
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
-
   --color-background-primary:   #1a1b1e;
   --color-background-secondary: #25262b;
   --color-background-tertiary:  #2c2e33;
@@ -20,11 +19,9 @@
   --color-background-success:   #1a2e22;
   --color-background-danger:    #2e1a1a;
   --color-background-warning:   #2e2519;
-
   --color-border-primary:   #4a4d57;
   --color-border-secondary: #3a3d47;
   --color-border-tertiary:  #2e3138;
-
   --color-text-primary:   #e8eaf0;
   --color-text-secondary: #9099ad;
   --color-text-tertiary:  #5c6478;
@@ -33,47 +30,12 @@
   --color-text-danger:    #ff7070;
   --color-text-warning:   #ffb347;
 }
-
-html, body {
-  background: var(--color-background-primary);
-  color: var(--color-text-primary);
-  min-height: 100vh;
-}
-body {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 1.5rem 1rem;
-}
-
-input, button:not(.del-btn), select {
-  background: var(--color-background-secondary);
-  color: var(--color-text-primary);
-  border: 0.5px solid var(--color-border-secondary);
-  border-radius: var(--border-radius-md);
-  padding: 7px 12px;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  outline: none;
-  transition: border-color 0.15s, background 0.15s;
-}
-input:focus {
-  border-color: var(--color-border-primary);
-  background: var(--color-background-tertiary);
-}
-button:not(.del-btn) {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 14px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-button:not(.del-btn):hover {
-  background: var(--color-background-tertiary);
-  border-color: var(--color-border-primary);
-}
-
+html, body { background: var(--color-background-primary); color: var(--color-text-primary); min-height: 100vh; }
+body { max-width: 720px; margin: 0 auto; padding: 1.5rem 1rem; }
+input, button:not(.del-btn), select { background: var(--color-background-secondary); color: var(--color-text-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 7px 12px; font-family: var(--font-sans); font-size: 13px; outline: none; transition: border-color 0.15s, background 0.15s; }
+input:focus { border-color: var(--color-border-primary); background: var(--color-background-tertiary); }
+button:not(.del-btn) { cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; font-weight: 500; white-space: nowrap; }
+button:not(.del-btn):hover { background: var(--color-background-tertiary); border-color: var(--color-border-primary); }
 *{box-sizing:border-box;margin:0;padding:0;}
 .wrap{padding:1.5rem 0;font-family:var(--font-sans);}
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--color-border-tertiary);margin-bottom:1.5rem;}
@@ -106,24 +68,11 @@ button:not(.del-btn):hover {
 .bd{background:var(--color-background-danger);color:var(--color-text-danger);}
 .bs{background:var(--color-background-success);color:var(--color-text-success);}
 .r-id{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px;}
-
-/* 메타 행 (메모 + 리플보기 가로 나열) */
-.r-meta,
-.list-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 3px;
-  flex-wrap: wrap;
-}
-.r-memo-text,
-.list-memo-text {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-.replay-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-info);text-decoration:none;background:var(--color-background-info);border-radius:99px;padding:2px 9px;border:0.5px solid transparent;transition:border-color 0.15s;margin-top:0;}
+.r-meta,.list-meta{display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap;}
+.r-memo-text,.list-memo-text{font-size:13px;color:var(--color-text-secondary);}
+.replay-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-info);text-decoration:none;background:var(--color-background-info);border-radius:99px;padding:2px 9px;border:0.5px solid transparent;transition:border-color 0.15s;}
 .replay-link:hover{border-color:var(--color-text-info);}
-
+.player-badge{font-size:11px;font-weight:600;color:var(--color-text-warning);background:var(--color-background-warning);border-radius:99px;padding:2px 7px;}
 .tbl-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem;}
 table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
 thead tr{background:var(--color-background-secondary);}
@@ -157,20 +106,15 @@ td select.player-cell:focus{background:var(--color-background-info);}
 </style>
 </head>
 <body>
-
 <div class="wrap">
-<h2 class="sr-only">트롤 조회 및 관리</h2>
-
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('lookup')"><i class="ti ti-search" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>조회</button>
-  <button class="tab" onclick="switchTab('edit')"><i class="ti ti-table" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>편집</button>
-  <button class="tab" onclick="switchTab('settings')"><i class="ti ti-settings" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>설정</button>
+  <button class="tab active" onclick="switchTab('lookup')"><i class="ti ti-search" style="font-size:14px;margin-right:5px"></i>조회</button>
+  <button class="tab" onclick="switchTab('edit')"><i class="ti ti-table" style="font-size:14px;margin-right:5px"></i>편집</button>
+  <button class="tab" onclick="switchTab('settings')"><i class="ti ti-settings" style="font-size:14px;margin-right:5px"></i>설정</button>
 </div>
 
 <div id="panel-lookup" class="panel active">
-  <div id="autoLoadBanner" style="display:none;margin-bottom:1rem;">
-    <div class="info-box" id="autoLoadMsg"></div>
-  </div>
+  <div id="autoLoadBanner" style="display:none;margin-bottom:1rem;"><div class="info-box" id="autoLoadMsg"></div></div>
   <div id="lookupMain">
     <div class="stat-row">
       <div class="stat"><div class="n" id="statTotal">0</div><div class="l">전체 등록</div></div>
@@ -180,7 +124,7 @@ td select.player-cell:focus{background:var(--color-background-info);}
     <div class="section-label">아이디 조회</div>
     <div class="search-row">
       <input type="text" id="searchInput" placeholder="조회할 아이디 입력" oninput="doSearch()">
-      <button onclick="clearSearch()"><i class="ti ti-x" aria-hidden="true"></i></button>
+      <button onclick="clearSearch()"><i class="ti ti-x"></i></button>
     </div>
     <div id="searchResult"></div>
     <div id="listSection">
@@ -191,79 +135,57 @@ td select.player-cell:focus{background:var(--color-background-info);}
 </div>
 
 <div id="panel-edit" class="panel">
-  <div id="editMain" style="display:block">
-    <div class="toolbar">
-      <input type="text" id="newId" placeholder="새 아이디" style="max-width:140px">
-      <input type="text" id="newMemo" placeholder="메모 (선택)" style="max-width:160px">
-      <input type="text" id="newUrl" placeholder="해시 또는 풀 URL" style="max-width:200px;font-family:var(--font-mono);font-size:12px" onblur="trimReplayInput(this)">
-      <select id="newPlayer" style="max-width:90px">
-        <option value="0">플레이어 -</option>
-        <option value="1">1번</option>
-        <option value="2">2번</option>
-        <option value="3">3번</option>
-        <option value="4">4번</option>
-        <option value="5">5번</option>
-        <option value="6">6번</option>
-        <option value="7">7번</option>
-        <option value="8">8번</option>
-        <option value="9">9번</option>
-        <option value="10">10번</option>
-        <option value="11">11번</option>
-        <option value="12">12번</option>
-      </select>
-      <button onclick="addRow()"><i class="ti ti-plus" aria-hidden="true"></i> 추가</button>
-      <button onclick="saveJSON()" id="saveBtn" style="margin-left:auto"><i class="ti ti-brand-github" aria-hidden="true"></i> GitHub에 저장</button>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <colgroup>
-          <col style="width:44px">
-          <col style="width:20%">
-          <col style="width:20%">
-          <col>
-          <col style="width:80px">
-          <col style="width:48px">
-        </colgroup>
-        <thead><tr>
-          <th></th>
-          <th>아이디</th>
-          <th>메모</th>
-          <th>리플 해시</th>
-          <th style="text-align:center">플레이어</th>
-          <th></th>
-        </tr></thead>
-        <tbody id="editTbody"></tbody>
-      </table>
-    </div>
-    <div style="font-size:12px;color:var(--color-text-secondary)"><i class="ti ti-grip-vertical" aria-hidden="true" style="font-size:12px"></i> 드래그로 순서 변경 &nbsp;·&nbsp; 셀 클릭으로 직접 편집</div>
+  <div class="toolbar">
+    <input type="text" id="newId" placeholder="새 아이디" style="max-width:140px">
+    <input type="text" id="newMemo" placeholder="메모 (선택)" style="max-width:160px">
+    <input type="text" id="newUrl" placeholder="해시 또는 풀 URL" style="max-width:200px;font-family:var(--font-mono);font-size:12px" onblur="trimReplayInput(this)">
+    <select id="newPlayer" style="max-width:90px">
+      <option value="0">플레이어 -</option>
+      <option value="1">1번</option><option value="2">2번</option><option value="3">3번</option>
+      <option value="4">4번</option><option value="5">5번</option><option value="6">6번</option>
+      <option value="7">7번</option><option value="8">8번</option><option value="9">9번</option>
+      <option value="10">10번</option><option value="11">11번</option><option value="12">12번</option>
+    </select>
+    <button onclick="addRow()"><i class="ti ti-plus"></i> 추가</button>
+    <button onclick="saveJSON()" id="saveBtn" style="margin-left:auto"><i class="ti ti-brand-github"></i> GitHub에 저장</button>
   </div>
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:44px"><col style="width:20%"><col style="width:20%">
+        <col><col style="width:80px"><col style="width:48px">
+      </colgroup>
+      <thead><tr>
+        <th></th><th>아이디</th><th>메모</th><th>리플 해시</th>
+        <th style="text-align:center">플레이어</th><th></th>
+      </tr></thead>
+      <tbody id="editTbody"></tbody>
+    </table>
+  </div>
+  <div style="font-size:12px;color:var(--color-text-secondary)"><i class="ti ti-grip-vertical" style="font-size:12px"></i> 드래그로 순서 변경 &nbsp;·&nbsp; 셀 클릭으로 직접 편집</div>
 </div>
 
 <div id="panel-settings" class="panel">
-  <div class="info-box">
-    아래 URL에 JSON 파일이 있으면 페이지 로드 시 자동으로 불러옵니다.<br>
-    CORS가 허용된 주소여야 합니다 (GitHub Pages, raw.githubusercontent.com 등).
-  </div>
+  <div class="info-box">아래 URL에 JSON 파일이 있으면 페이지 로드 시 자동으로 불러옵니다.<br>CORS가 허용된 주소여야 합니다 (GitHub Pages, raw.githubusercontent.com 등).</div>
   <div class="section-label">JSON 데이터 URL</div>
   <div class="url-bar" style="margin-bottom:0.5rem">
     <input type="text" id="urlInput" placeholder="https://example.github.io/trolls.json" style="font-family:var(--font-mono);font-size:13px">
-    <button onclick="fetchFromUrl()"><i class="ti ti-refresh" aria-hidden="true"></i> 불러오기</button>
+    <button onclick="fetchFromUrl()"><i class="ti ti-refresh"></i> 불러오기</button>
     <span id="urlStatus" style="display:none" class="url-status"></span>
   </div>
   <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:1.5rem">
-    상대 경로도 가능: <code style="font-family:var(--font-mono);background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">/trolls.json</code> &nbsp;또는&nbsp; <code style="font-family:var(--font-mono);background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">./data/trolls.json</code>
+    상대 경로도 가능: <code style="font-family:var(--font-mono);background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">/trolls.json</code>
   </div>
   <div class="divider">또는 파일 직접 업로드</div>
   <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()" style="margin-bottom:0">
     <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(event)">
-    <div id="upIcon" style="font-size:24px;color:var(--color-text-secondary);margin-bottom:6px"><i class="ti ti-file-upload" aria-hidden="true"></i></div>
+    <div id="upIcon" style="font-size:24px;color:var(--color-text-secondary);margin-bottom:6px"><i class="ti ti-file-upload"></i></div>
     <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px" id="upTitle">클릭하여 JSON 파일 선택</div>
     <div style="font-size:12px;color:var(--color-text-secondary)" id="upSub">[{"id":"...","memo":"...","replay":"..."}] 배열 형식</div>
   </div>
 </div>
 </div>
 
-<!-- 편집 권한 확인 모달 -->
 <div id="permModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;">
   <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-primary);border-radius:var(--border-radius-lg);padding:1.5rem 1.75rem;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.75rem;">
@@ -280,487 +202,310 @@ td select.player-cell:focus{background:var(--color-background-info);}
 
 <script>
 const DEFAULT_JSON_URL = 'troll_list.json';
+let data = [], dragSrc = null;
 
-let data = [];
-let dragSrc = null;
-
-// ─── 편집 권한 확인 ───────────────────────────────────────────────
 const PERM_COOKIE = 'edit_permitted';
+function hasPermCookie(){ return document.cookie.split(';').some(c=>c.trim().startsWith(PERM_COOKIE+'=1')); }
+function setPermCookie(){ document.cookie=`${PERM_COOKIE}=1;path=/;SameSite=Lax`; }
 
-function hasPermCookie() {
-  return document.cookie.split(';').some(c => c.trim().startsWith(PERM_COOKIE + '=1'));
-}
-function setPermCookie() {
-  document.cookie = `${PERM_COOKIE}=1;path=/;SameSite=Lax`;
-}
-function clearPermCookie() {
-  document.cookie = `${PERM_COOKIE}=0;path=/;max-age=0`;
-}
-
-let _pendingAction = null;
-let _cancelAction = null;
-
-function requirePerm(action, cancel) {
-  if (hasPermCookie()) { action(); return; }
-  const r = getGithubRepo();
-  const repoStr = r ? `${r.owner}/${r.repo}` : '이 저장소';
-  document.getElementById('permModalMsg').textContent =
-    `${repoStr} 저장소의 편집 권한이 있는 경우에만 변경 사항이 반영됩니다. 계속하시겠습니까?`;
-  const modal = document.getElementById('permModal');
-  modal.style.display = 'flex';
-  _pendingAction = action;
-  _cancelAction = cancel || null;
+let _pendingAction=null, _cancelAction=null;
+function requirePerm(action, cancel){
+  if(hasPermCookie()){ action(); return; }
+  const r=getGithubRepo();
+  const repoStr=r?`${r.owner}/${r.repo}`:'이 저장소';
+  document.getElementById('permModalMsg').textContent=`${repoStr} 저장소의 편집 권한이 있는 경우에만 변경 사항이 반영됩니다. 계속하시겠습니까?`;
+  document.getElementById('permModal').style.display='flex';
+  _pendingAction=action; _cancelAction=cancel||null;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('permConfirmBtn').addEventListener('click', () => {
-    setPermCookie();
-    document.getElementById('permModal').style.display = 'none';
-    if (_pendingAction) { _pendingAction(); _pendingAction = null; }
-    _cancelAction = null;
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('permConfirmBtn').addEventListener('click',()=>{
+    setPermCookie(); document.getElementById('permModal').style.display='none';
+    if(_pendingAction){ _pendingAction(); _pendingAction=null; } _cancelAction=null;
   });
-  document.getElementById('permCancelBtn').addEventListener('click', () => {
-    document.getElementById('permModal').style.display = 'none';
-    if (_cancelAction) { _cancelAction(); _cancelAction = null; }
-    _pendingAction = null;
+  document.getElementById('permCancelBtn').addEventListener('click',()=>{
+    document.getElementById('permModal').style.display='none';
+    if(_cancelAction){ _cancelAction(); _cancelAction=null; } _pendingAction=null;
   });
 });
 
-// ─── 탭 전환 ──────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['lookup','edit','settings'][i]===name));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['lookup','edit','settings'][i]===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  if (name==='edit') renderEditTable();
+  if(name==='edit') renderEditTable();
 }
 
-// ─── 자동 로드 ────────────────────────────────────────────────────
-async function autoLoad() {
-  const url = DEFAULT_JSON_URL.trim();
-  if (!url) return;
-  const banner = document.getElementById('autoLoadBanner');
-  const msg = document.getElementById('autoLoadMsg');
-  banner.style.display = 'block';
-  msg.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> ' + esc(url) + ' 에서 불러오는 중...';
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const parsed = await res.json();
-    applyData(parsed, urlLabel(url));
-    msg.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i> 자동 로드 완료: ' + esc(url);
-    document.getElementById('urlInput').value = url;
-  } catch(e) {
-    banner.style.display = 'none';
-  }
+async function autoLoad(){
+  const url=DEFAULT_JSON_URL.trim(); if(!url) return;
+  const banner=document.getElementById('autoLoadBanner'), msg=document.getElementById('autoLoadMsg');
+  banner.style.display='block';
+  msg.innerHTML='<i class="ti ti-loader"></i> '+esc(url)+' 에서 불러오는 중...';
+  try{
+    const res=await fetch(url); if(!res.ok) throw new Error('HTTP '+res.status);
+    const parsed=await res.json(); applyData(parsed,urlLabel(url));
+    msg.innerHTML='<i class="ti ti-circle-check"></i> 자동 로드 완료: '+esc(url);
+    document.getElementById('urlInput').value=url;
+  }catch(e){ banner.style.display='none'; }
 }
 
-async function fetchFromUrl() {
-  const url = document.getElementById('urlInput').value.trim();
-  if (!url) return;
-  if (data.length > 0) {
-    const ok = confirm(`기존 데이터 ${data.length}개가 삭제되고 새 파일로 교체됩니다.\n계속하시겠습니까?`);
-    if (!ok) return;
-  }
-  const st = document.getElementById('urlStatus');
-  st.style.display = 'inline-flex';
-  st.className = 'url-status us-loading';
-  st.textContent = '로드 중...';
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const parsed = await res.json();
-    applyData(parsed, urlLabel(url));
-    st.className = 'url-status us-ok';
-    st.textContent = '완료 (' + data.length + '개)';
-    toast('URL에서 ' + data.length + '개 로드됨', 'success');
-  } catch(e) {
-    st.className = 'url-status us-err';
-    st.textContent = '실패: ' + e.message;
-    toast('로드 실패: ' + e.message, 'danger');
-  }
+async function fetchFromUrl(){
+  const url=document.getElementById('urlInput').value.trim(); if(!url) return;
+  if(data.length>0 && !confirm(`기존 데이터 ${data.length}개가 삭제됩니다. 계속하시겠습니까?`)) return;
+  const st=document.getElementById('urlStatus');
+  st.style.display='inline-flex'; st.className='url-status us-loading'; st.textContent='로드 중...';
+  try{
+    const res=await fetch(url); if(!res.ok) throw new Error('HTTP '+res.status);
+    const parsed=await res.json(); applyData(parsed,urlLabel(url));
+    st.className='url-status us-ok'; st.textContent='완료 ('+data.length+'개)';
+    toast('URL에서 '+data.length+'개 로드됨','success');
+  }catch(e){ st.className='url-status us-err'; st.textContent='실패: '+e.message; toast('로드 실패: '+e.message,'danger'); }
 }
 
-function loadFile(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (data.length > 0) {
-    const ok = confirm(`기존 데이터 ${data.length}개가 삭제되고 새 파일로 교체됩니다.\n계속하시겠습니까?`);
-    if (!ok) { e.target.value = ''; return; }
-  }
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    try {
-      const parsed = JSON.parse(ev.target.result);
-      applyData(parsed, file.name);
+function loadFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  if(data.length>0 && !confirm(`기존 데이터 ${data.length}개가 삭제됩니다. 계속하시겠습니까?`)){ e.target.value=''; return; }
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const parsed=JSON.parse(ev.target.result); applyData(parsed,file.name);
       document.getElementById('uploadArea').classList.add('loaded');
-      document.getElementById('upIcon').innerHTML = '<i class="ti ti-circle-check" aria-hidden="true" style="color:var(--color-text-success)"></i>';
-      document.getElementById('upTitle').textContent = file.name;
-      document.getElementById('upSub').textContent = data.length + '개 항목 로드됨';
-      e.target.value = '';
-      toast(`${file.name} — ${data.length}개 로드됨`, 'success');
-    } catch(err) {
-      document.getElementById('upTitle').textContent = '오류: ' + err.message;
-      toast('파일 오류: ' + err.message, 'danger');
-    }
+      document.getElementById('upIcon').innerHTML='<i class="ti ti-circle-check" style="color:var(--color-text-success)"></i>';
+      document.getElementById('upTitle').textContent=file.name;
+      document.getElementById('upSub').textContent=data.length+'개 항목 로드됨';
+      e.target.value=''; toast(`${file.name} — ${data.length}개 로드됨`,'success');
+    }catch(err){ document.getElementById('upTitle').textContent='오류: '+err.message; toast('파일 오류: '+err.message,'danger'); }
   };
   reader.readAsText(file);
 }
 
-// ─── 한글 자모 분리 ────────────────────────────────────────────────
-function decomposeHangul(str) {
-  const CHO  = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-  const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
-  const JONG  = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-  return [...str].map(ch => {
-    const code = ch.charCodeAt(0);
-    if (code < 0xAC00 || code > 0xD7A3) return ch;
-    const offset = code - 0xAC00;
-    const jong = offset % 28;
-    const jung = ((offset - jong) / 28) % 21;
-    const cho  = Math.floor((offset - jong) / 28 / 21);
-    return CHO[cho] + JUNG[jung] + JONG[jong];
+function decomposeHangul(str){
+  const CHO =['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const JUNG=['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+  const JONG =['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  return [...str].map(ch=>{
+    const code=ch.charCodeAt(0);
+    if(code<0xAC00||code>0xD7A3) return ch;
+    const offset=code-0xAC00, jong=offset%28, jung=((offset-jong)/28)%21, cho=Math.floor((offset-jong)/28/21);
+    return CHO[cho]+JUNG[jung]+JONG[jong];
   }).join('');
 }
 
-// ─── 된소리 확장 매핑 ─────────────────────────────────────────────
-const TENSED_MAP = {
-  'ㄱ': ['ㄱ','ㄲ'],
-  'ㄷ': ['ㄷ','ㄸ'],
-  'ㅂ': ['ㅂ','ㅃ'],
-  'ㅅ': ['ㅅ','ㅆ'],
-  'ㅈ': ['ㅈ','ㅉ'],
-};
+const TENSED_MAP={'ㄱ':['ㄱ','ㄲ'],'ㄷ':['ㄷ','ㄸ'],'ㅂ':['ㅂ','ㅃ'],'ㅅ':['ㅅ','ㅆ'],'ㅈ':['ㅈ','ㅉ']};
 
-function matchesQuery(decomposedId, decomposedQuery) {
-  if (decomposedQuery.length > decomposedId.length) return false;
-  for (let i = 0; i < decomposedQuery.length; i++) {
-    const qCh = decomposedQuery[i];
-    const tCh = decomposedId[i];
-    if (qCh === tCh) continue;
-    const expanded = TENSED_MAP[qCh];
-    if (expanded && expanded.includes(tCh)) continue;
+function matchesQuery(decomposedId, decomposedQuery){
+  if(decomposedQuery.length>decomposedId.length) return false;
+  for(let i=0;i<decomposedQuery.length;i++){
+    const qCh=decomposedQuery[i], tCh=decomposedId[i];
+    if(qCh===tCh) continue;
+    const expanded=TENSED_MAP[qCh];
+    if(expanded&&expanded.includes(tCh)) continue;
     return false;
   }
   return true;
 }
 
-// ─── mafia42 리플 해시 처리 ───────────────────────────────────────
-const MAFIA42_BASE = 'https://mafia42.com/history/kr/';
+const MAFIA42_BASE='https://mafia42.com/history/kr/';
 
-function parseReplayHash(val) {
-  if (!val) return '';
-  val = val.trim();
-  const m = val.match(/mafia42\.com\/history\/kr\/([a-f0-9]+)/i);
-  if (m) return m[1];
-  if (/^[a-f0-9]{8,}$/i.test(val)) return val.toLowerCase();
+function parseReplayHash(val){
+  if(!val) return ''; val=val.trim();
+  const m=val.match(/mafia42\.com\/history\/kr\/([a-f0-9]+)/i);
+  if(m) return m[1];
+  if(/^[a-f0-9]{8,}$/i.test(val)) return val.toLowerCase();
   return '';
 }
 
-function replayLinkHTML(replayHash, player) {
-  if (!replayHash) return '';
-  const href = MAFIA42_BASE + replayHash;
-  const playerBadge = player
-    ? `<span style="font-size:11px;font-weight:600;margin-right:1px">${player}</span>`
-    : '';
-  const tip = player ? `${player}번 플레이어` : '';
-  return `<a href="${esc(href)}" target="_blank" rel="noopener" class="replay-link"${tip ? ` title="${esc(tip)}"` : ''}>${playerBadge}<i class="ti ti-player-play" aria-hidden="true" style="font-size:11px"></i> 리플보기</a>`;
+function replayLinkHTML(replayHash, player){
+  if(!replayHash) return '';
+  const href=MAFIA42_BASE+replayHash;
+  const link=`<a href="${esc(href)}" target="_blank" rel="noopener" class="replay-link"><i class="ti ti-player-play" style="font-size:11px"></i> 리플보기</a>`;
+  const playerBadge=player?`<span class="player-badge">${player}번</span>`:'';
+  return link+playerBadge;
 }
 
-function applyData(parsed, src) {
-  if (!Array.isArray(parsed)) throw new Error('배열 형식이 아닙니다');
-  data = parsed.map(item => {
-    const id = String(item.id||'').trim();
-    const rawReplay = item.replay || item.url || '';
-    return {
-      id,
-      memo: item.memo||'',
-      replay: parseReplayHash(rawReplay),
-      replayPlayer: item.replayPlayer||0,
-      decomposed: decomposeHangul(id.toLowerCase())
-    };
+function applyData(parsed, src){
+  if(!Array.isArray(parsed)) throw new Error('배열 형식이 아닙니다');
+  data=parsed.map(item=>{
+    const id=String(item.id||'').trim();
+    const rawReplay=item.replay||item.url||'';
+    return{ id, memo:item.memo||'', replay:parseReplayHash(rawReplay), replayPlayer:item.replayPlayer||0, decomposed:decomposeHangul(id.toLowerCase()) };
   });
-  document.getElementById('statSrc').innerHTML = src;
-  updateStats();
-  renderList();
-  renderEditTable();
+  document.getElementById('statSrc').innerHTML=src;
+  updateStats(); renderList(); renderEditTable();
 }
 
-function getGithubRepo() {
-  const m = location.hostname.match(/^([^.]+)\.github\.io$/);
-  if (!m) return null;
-  const owner = m[1];
-  const repo = location.pathname.split('/').filter(Boolean)[0] || null;
-  return repo ? { owner, repo } : null;
+function getGithubRepo(){
+  const m=location.hostname.match(/^([^.]+)\.github\.io$/); if(!m) return null;
+  const owner=m[1], repo=location.pathname.split('/').filter(Boolean)[0]||null;
+  return repo?{owner,repo}:null;
 }
 
-function urlLabel(url) {
-  const r = getGithubRepo();
-  if (r) {
-    const repoUrl = `https://github.com/${r.owner}/${r.repo}`;
-    return `<a href="${repoUrl}" target="_blank" rel="noopener" style="color:var(--color-text-info);text-decoration:none">${r.owner}/${r.repo}</a>`;
-  }
-  try { return esc(new URL(url, location.href).hostname || url); } catch { return esc(url); }
+function urlLabel(url){
+  const r=getGithubRepo();
+  if(r){ const repoUrl=`https://github.com/${r.owner}/${r.repo}`; return `<a href="${repoUrl}" target="_blank" rel="noopener" style="color:var(--color-text-info);text-decoration:none">${r.owner}/${r.repo}</a>`; }
+  try{ return esc(new URL(url,location.href).hostname||url); }catch{ return esc(url); }
 }
 
-function updateStats() {
-  document.getElementById('statTotal').textContent = data.length;
-  document.getElementById('statTroll').textContent = data.length;
+function updateStats(){
+  document.getElementById('statTotal').textContent=data.length;
+  document.getElementById('statTroll').textContent=data.length;
 }
 
-// ─── 검색 ─────────────────────────────────────────────────────────
-function doSearch() {
-  const q = document.getElementById('searchInput').value.trim();
-  const resultEl = document.getElementById('searchResult');
-  const listSection = document.getElementById('listSection');
-  if (!q) { resultEl.innerHTML=''; listSection.style.display='block'; return; }
+function doSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  const resultEl=document.getElementById('searchResult'), listSection=document.getElementById('listSection');
+  if(!q){ resultEl.innerHTML=''; listSection.style.display='block'; return; }
   listSection.style.display='none';
-
-  const key = q.toLowerCase();
-  const keyDecomp = decomposeHangul(key);
-
-  const exactItem = data.find(i => i.id.toLowerCase() === key);
-
-  if (exactItem) {
-    const { id: origId, memo, replay, replayPlayer } = exactItem;
-    const replayHtml = replayLinkHTML(replay, replayPlayer);
-    const memoText = memo ? esc(memo) : '메모 없음';
-    resultEl.innerHTML = `<div class="result-card">
-      <div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+  const key=q.toLowerCase(), keyDecomp=decomposeHangul(key);
+  const exactItem=data.find(i=>i.id.toLowerCase()===key);
+  if(exactItem){
+    const{id:origId,memo,replay,replayPlayer}=exactItem;
+    const replayHtml=replayLinkHTML(replay,replayPlayer);
+    resultEl.innerHTML=`<div class="result-card">
+      <div class="r-icon icon-troll"><i class="ti ti-alert-triangle"></i></div>
       <div>
-        <div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div>
-        <div class="r-meta">
-          <span class="r-memo-text">${memoText}</span>
-          ${replayHtml}
-        </div>
+        <div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px"></i> 트롤</span></div>
+        <div class="r-meta"><span class="r-memo-text">${memo?esc(memo):'메모 없음'}</span>${replayHtml}</div>
       </div>
     </div>`;
-  } else {
-    const similar = data.filter(i => {
-      if (!i.id) return false;
-      if (i.id.toLowerCase() === key) return false;
-      const idDecomp = i.decomposed || decomposeHangul(i.id.toLowerCase());
-      return matchesQuery(idDecomp, keyDecomp);
+  }else{
+    const similar=data.filter(i=>{
+      if(!i.id||i.id.toLowerCase()===key) return false;
+      return matchesQuery(i.decomposed||decomposeHangul(i.id.toLowerCase()),keyDecomp);
     });
-    resultEl.innerHTML = `<div class="result-card">
-      <div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+    resultEl.innerHTML=`<div class="result-card">
+      <div class="r-icon icon-clean"><i class="ti ti-circle-check"></i></div>
       <div>
-        <div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div>
+        <div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px"></i> 정상</span></div>
         <div class="r-meta"><span class="r-memo-text">등록된 트롤이 아닙니다</span></div>
       </div>
-    </div>${similar.length ? `<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>` : ''}`;
+    </div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
   }
 }
 
-function clearSearch() {
+function clearSearch(){
   document.getElementById('searchInput').value='';
   document.getElementById('searchResult').innerHTML='';
   document.getElementById('listSection').style.display='block';
 }
 
-function renderList() {
-  const el = document.getElementById('listWrap');
-  el.innerHTML = data.length ? data.map(listItemHTML).join('') : '<div class="empty-msg">항목 없음</div>';
+function renderList(){
+  const el=document.getElementById('listWrap');
+  el.innerHTML=data.length?data.map(listItemHTML).join(''):'<div class="empty-msg">항목 없음</div>';
 }
 
-function listItemHTML(item) {
-  const replayHtml = replayLinkHTML(item.replay, item.replayPlayer);
-  const memoLine = item.memo
-    ? esc(item.memo)
-    : `<span style="color:var(--color-text-tertiary)">메모 없음</span>`;
+function listItemHTML(item){
+  const replayHtml=replayLinkHTML(item.replay,item.replayPlayer);
+  const memoLine=item.memo?esc(item.memo):`<span style="color:var(--color-text-tertiary)">메모 없음</span>`;
   return `<div class="list-item">
-    <i class="ti ti-ban" aria-hidden="true" style="font-size:15px;color:var(--color-text-danger);flex-shrink:0"></i>
+    <i class="ti ti-ban" style="font-size:15px;color:var(--color-text-danger);flex-shrink:0"></i>
     <div class="list-body">
       <div class="list-id">${esc(item.id)}</div>
-      <div class="list-meta">
-        <span class="list-memo-text">${memoLine}</span>
-        ${replayHtml}
-      </div>
+      <div class="list-meta"><span class="list-memo-text">${memoLine}</span>${replayHtml}</div>
     </div>
   </div>`;
 }
 
-// ─── 편집 테이블 ──────────────────────────────────────────────────
-function renderEditTable() {
-  const tbody = document.getElementById('editTbody');
-  tbody.innerHTML = '';
-  data.forEach((item, idx) => {
-    const tr = document.createElement('tr');
-    tr.dataset.idx = idx;
-    tr.draggable = true;
-
-    const playerOpts = [0,1,2,3,4,5,6,7,8,9,10,11,12].map(n =>
-      `<option value="${n}" ${item.replayPlayer==n?'selected':''}>${n===0?'-':n+'번'}</option>`
-    ).join('');
-
-    tr.innerHTML = `
-      <td><div class="drag-handle"><i class="ti ti-grip-vertical" aria-hidden="true"></i></div></td>
+function renderEditTable(){
+  const tbody=document.getElementById('editTbody'); tbody.innerHTML='';
+  data.forEach((item,idx)=>{
+    const tr=document.createElement('tr'); tr.dataset.idx=idx; tr.draggable=true;
+    const playerOpts=[0,1,2,3,4,5,6,7,8,9,10,11,12].map(n=>`<option value="${n}" ${item.replayPlayer==n?'selected':''}>${n===0?'-':n+'번'}</option>`).join('');
+    tr.innerHTML=`
+      <td><div class="drag-handle"><i class="ti ti-grip-vertical"></i></div></td>
       <td><input type="text" value="${esc(item.id)}" placeholder="아이디" oninput="updateCell(${idx},'id',this.value)"></td>
       <td><input type="text" value="${esc(item.memo)}" placeholder="메모 없음" oninput="updateCell(${idx},'memo',this.value)"></td>
       <td><input type="text" class="url-cell" value="${esc(item.replay||'')}" placeholder="해시 또는 풀 URL" oninput="updateReplay(${idx},this.value)" onblur="trimReplayCell(this,${idx})"></td>
-      <td>
-        <select class="player-cell" onchange="updatePlayer(${idx},this.value)">
-          ${playerOpts}
-        </select>
-      </td>
-      <td><button class="del-btn" onclick="deleteRow(${idx})" aria-label="삭제"><i class="ti ti-trash" aria-hidden="true"></i></button></td>`;
-
-    tr.addEventListener('dragstart', onDragStart);
-    tr.addEventListener('dragover', onDragOver);
-    tr.addEventListener('drop', onDrop);
-    tr.addEventListener('dragend', onDragEnd);
+      <td><select class="player-cell" onchange="updatePlayer(${idx},this.value)">${playerOpts}</select></td>
+      <td><button class="del-btn" onclick="deleteRow(${idx})"><i class="ti ti-trash"></i></button></td>`;
+    tr.addEventListener('dragstart',onDragStart); tr.addEventListener('dragover',onDragOver);
+    tr.addEventListener('drop',onDrop); tr.addEventListener('dragend',onDragEnd);
     tbody.appendChild(tr);
   });
 }
 
-function updateCell(idx, field, val) {
-  const prev = data[idx][field];
-  requirePerm(
-    () => {
-      data[idx][field] = val;
-      if (field==='id') data[idx].decomposed = decomposeHangul(val.toLowerCase());
-      updateStats(); renderList();
-    },
-    () => { data[idx][field] = prev; renderEditTable(); }
-  );
+function updateCell(idx,field,val){
+  const prev=data[idx][field];
+  requirePerm(()=>{ data[idx][field]=val; if(field==='id') data[idx].decomposed=decomposeHangul(val.toLowerCase()); updateStats(); renderList(); },()=>{ data[idx][field]=prev; renderEditTable(); });
 }
 
-function trimReplayInput(input) {
-  const hash = parseReplayHash(input.value);
-  input.value = hash;
+function trimReplayInput(input){ input.value=parseReplayHash(input.value); }
+
+function trimReplayCell(input,idx){
+  const hash=parseReplayHash(input.value); input.value=hash;
+  if(!hash&&data[idx]&&data[idx].replayPlayer){ data[idx].replayPlayer=0; renderEditTable(); }
 }
 
-function trimReplayCell(input, idx) {
-  const hash = parseReplayHash(input.value);
-  input.value = hash;
-  if (!hash && data[idx] && data[idx].replayPlayer) {
-    data[idx].replayPlayer = 0;
-    renderEditTable();
-  }
+function updateReplay(idx,val){
+  const prev=data[idx].replay, hash=parseReplayHash(val);
+  requirePerm(()=>{ data[idx].replay=hash; renderList(); },()=>{ data[idx].replay=prev; renderEditTable(); });
 }
 
-function updateReplay(idx, val) {
-  const prev = data[idx].replay;
-  const hash = parseReplayHash(val);
-  requirePerm(
-    () => { data[idx].replay = hash; renderList(); },
-    () => { data[idx].replay = prev; renderEditTable(); }
-  );
+function updatePlayer(idx,val){
+  const prev=data[idx].replayPlayer;
+  requirePerm(()=>{
+    if(!data[idx].replay){ data[idx].replayPlayer=0; toast('리플레이 주소가 없어 플레이어 번호가 적용되지 않습니다','info'); renderEditTable(); return; }
+    data[idx].replayPlayer=parseInt(val)||0; renderList();
+  },()=>{ data[idx].replayPlayer=prev; renderEditTable(); });
 }
 
-function updatePlayer(idx, val) {
-  const prev = data[idx].replayPlayer;
-  requirePerm(
-    () => {
-      if (!data[idx].replay) {
-        data[idx].replayPlayer = 0;
-        toast('리플레이 주소가 없어 플레이어 번호가 적용되지 않습니다', 'info');
-        renderEditTable();
-        return;
-      }
-      data[idx].replayPlayer = parseInt(val)||0;
-      renderList();
-    },
-    () => { data[idx].replayPlayer = prev; renderEditTable(); }
-  );
+function addRow(){
+  const idVal=document.getElementById('newId').value.trim(); if(!idVal){ document.getElementById('newId').focus(); return; }
+  const memoVal=document.getElementById('newMemo').value.trim();
+  const replayHash=parseReplayHash(document.getElementById('newUrl').value.trim());
+  const playerVal=replayHash?(parseInt(document.getElementById('newPlayer').value)||0):0;
+  requirePerm(()=>{
+    const existing=data.findIndex(d=>d.id===idVal);
+    if(existing!==-1){ data[existing].memo=memoVal; data[existing].replay=replayHash; data[existing].replayPlayer=playerVal; toast(`"${idVal}" 덮어씀`,'info'); }
+    else{ data.push({id:idVal,memo:memoVal,replay:replayHash,replayPlayer:playerVal,decomposed:decomposeHangul(idVal.toLowerCase())}); toast(`"${idVal}" 추가됨`,'success'); }
+    document.getElementById('newId').value=''; document.getElementById('newMemo').value='';
+    document.getElementById('newUrl').value=''; document.getElementById('newPlayer').value='0';
+    updateStats(); renderList(); renderEditTable();
+  },()=>{ document.getElementById('newId').value=''; document.getElementById('newMemo').value=''; document.getElementById('newUrl').value=''; document.getElementById('newPlayer').value='0'; });
 }
 
-function addRow() {
-  const idVal = document.getElementById('newId').value.trim();
-  if (!idVal) { document.getElementById('newId').focus(); return; }
-  const memoVal    = document.getElementById('newMemo').value.trim();
-  const replayRaw  = document.getElementById('newUrl').value.trim();
-  const replayHash = parseReplayHash(replayRaw);
-  const playerVal  = replayHash ? (parseInt(document.getElementById('newPlayer').value)||0) : 0;
-
-  requirePerm(
-    () => {
-      const existing = data.findIndex(d => d.id === idVal);
-      if (existing !== -1) {
-        data[existing].memo         = memoVal;
-        data[existing].replay       = replayHash;
-        data[existing].replayPlayer = playerVal;
-        toast(`"${idVal}" 덮어씀`, 'info');
-      } else {
-        data.push({ id: idVal, memo: memoVal, replay: replayHash, replayPlayer: playerVal, decomposed: decomposeHangul(idVal.toLowerCase()) });
-        toast(`"${idVal}" 추가됨`, 'success');
-      }
-      document.getElementById('newId').value='';
-      document.getElementById('newMemo').value='';
-      document.getElementById('newUrl').value='';
-      document.getElementById('newPlayer').value='0';
-      updateStats(); renderList(); renderEditTable();
-    },
-    () => {
-      document.getElementById('newId').value='';
-      document.getElementById('newMemo').value='';
-      document.getElementById('newUrl').value='';
-      document.getElementById('newPlayer').value='0';
-    }
-  );
+function deleteRow(idx){
+  const id=data[idx].id;
+  requirePerm(()=>{ if(!confirm(`"${id}" 를 삭제할까요?`)) return; data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`,'danger'); });
 }
 
-function deleteRow(idx) {
-  const id = data[idx].id;
-  requirePerm(
-    () => { if (!confirm(`"${id}" 를 삭제할까요?`)) return; data.splice(idx,1); updateStats(); renderList(); renderEditTable(); toast(`"${id}" 삭제됨`, 'danger'); }
-  );
-}
-
-function getGithubEditUrl() {
-  const r = getGithubRepo();
-  if (!r) return null;
-  const filePath = DEFAULT_JSON_URL.trim().replace(/^\.?\//, '');
-  return `https://github.com/${r.owner}/${r.repo}/edit/main/${filePath}`;
-}
-
-function saveJSON() {
-  requirePerm(async () => {
-    const exportData = data.map(({ id, memo, replay, replayPlayer }) => {
-      const obj = { id, memo };
-      if (replay) { obj.replay = replay; if (replayPlayer) obj.replayPlayer = replayPlayer; }
-      return obj;
-    });
-    const json = JSON.stringify(exportData, null, 2);
-    try {
-      await navigator.clipboard.writeText(json);
-      toast('클립보드에 복사됨 — GitHub에서 붙여넣기 하세요', 'success');
-    } catch(e) {
-      prompt('아래 JSON을 복사하세요 (Ctrl+A → Ctrl+C):', json);
-    }
-    const editUrl = getGithubEditUrl();
-    if (editUrl) window.open(editUrl, '_blank');
-    else toast('GitHub Pages 주소가 아니어서 편집 페이지를 열 수 없습니다', 'danger');
+function saveJSON(){
+  requirePerm(async()=>{
+    const exportData=data.map(({id,memo,replay,replayPlayer})=>{ const o={id,memo}; if(replay){o.replay=replay; if(replayPlayer) o.replayPlayer=replayPlayer;} return o; });
+    const json=JSON.stringify(exportData,null,2);
+    try{ await navigator.clipboard.writeText(json); toast('클립보드에 복사됨 — GitHub에서 붙여넣기 하세요','success'); }
+    catch(e){ prompt('아래 JSON을 복사하세요:',json); }
+    const editUrl=getGithubEditUrl();
+    if(editUrl) window.open(editUrl,'_blank'); else toast('GitHub Pages 주소가 아니어서 편집 페이지를 열 수 없습니다','danger');
   });
 }
 
-// ─── 드래그 앤 드롭 ───────────────────────────────────────────────
-function onDragStart(e) { dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
-function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('tr.drag-over').forEach(r=>r.classList.remove('drag-over')); if(this!==dragSrc) this.classList.add('drag-over'); }
-function onDrop(e) { e.preventDefault(); if(this===dragSrc) return; const f=parseInt(dragSrc.dataset.idx),t=parseInt(this.dataset.idx); const[m]=data.splice(f,1); data.splice(t,0,m); renderEditTable(); renderList(); }
-function onDragEnd() { document.querySelectorAll('tr.dragging,tr.drag-over').forEach(r=>{r.classList.remove('dragging');r.classList.remove('drag-over');}); dragSrc=null; }
-
-// ─── 유틸 ─────────────────────────────────────────────────────────
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function toast(msg, type='info') {
-  const el = document.createElement('div');
-  el.className = 'toast toast-' + type;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('toast-show'));
-  setTimeout(() => { el.classList.remove('toast-show'); setTimeout(() => el.remove(), 300); }, 2500);
+function getGithubEditUrl(){
+  const r=getGithubRepo(); if(!r) return null;
+  return `https://github.com/${r.owner}/${r.repo}/edit/main/${DEFAULT_JSON_URL.replace(/^\.?\//,'')}`;
 }
 
-// ─── 이벤트 바인딩 ────────────────────────────────────────────────
-document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Escape')clearSearch();});
-document.getElementById('newId').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('newMemo').focus();});
-document.getElementById('newMemo').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('newUrl').focus();});
-document.getElementById('newUrl').addEventListener('keydown',e=>{if(e.key==='Enter')addRow();});
+function onDragStart(e){ dragSrc=this; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function onDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('tr.drag-over').forEach(r=>r.classList.remove('drag-over')); if(this!==dragSrc) this.classList.add('drag-over'); }
+function onDrop(e){ e.preventDefault(); if(this===dragSrc) return; const f=parseInt(dragSrc.dataset.idx),t=parseInt(this.dataset.idx); const[m]=data.splice(f,1); data.splice(t,0,m); renderEditTable(); renderList(); }
+function onDragEnd(){ document.querySelectorAll('tr.dragging,tr.drag-over').forEach(r=>{r.classList.remove('dragging');r.classList.remove('drag-over');}); dragSrc=null; }
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg,type='info'){
+  const el=document.createElement('div'); el.className='toast toast-'+type; el.textContent=msg;
+  document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('toast-show'));
+  setTimeout(()=>{ el.classList.remove('toast-show'); setTimeout(()=>el.remove(),300); },2500);
+}
+
+document.getElementById('searchInput').addEventListener('keydown',e=>{ if(e.key==='Escape') clearSearch(); });
+document.getElementById('newId').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('newMemo').focus(); });
+document.getElementById('newMemo').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('newUrl').focus(); });
+document.getElementById('newUrl').addEventListener('keydown',e=>{ if(e.key==='Enter') addRow(); });
 
 autoLoad();
-
-const _r = getGithubRepo();
-if (_r) document.getElementById('saveBtn').title = `${_r.owner}/${_r.repo} 저장소 편집 권한이 필요합니다`;
+const _r=getGithubRepo();
+if(_r) document.getElementById('saveBtn').title=`${_r.owner}/${_r.repo} 저장소 편집 권한이 필요합니다`;
 </script>
 </body>
 </html>
