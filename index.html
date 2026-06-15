@@ -39,7 +39,6 @@ html, body {
   color: var(--color-text-primary);
   min-height: 100vh;
 }
-
 body {
   max-width: 720px;
   margin: 0 auto;
@@ -107,9 +106,24 @@ button:not(.del-btn):hover {
 .bd{background:var(--color-background-danger);color:var(--color-text-danger);}
 .bs{background:var(--color-background-success);color:var(--color-text-success);}
 .r-id{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px;}
-.r-memo{font-size:13px;color:var(--color-text-secondary);}
-.replay-link{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:12px;color:var(--color-text-info);text-decoration:none;background:var(--color-background-info);border-radius:99px;padding:2px 9px;border:0.5px solid transparent;transition:border-color 0.15s;}
+
+/* 메타 행 (메모 + 리플보기 가로 나열) */
+.r-meta,
+.list-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+.r-memo-text,
+.list-memo-text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.replay-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-info);text-decoration:none;background:var(--color-background-info);border-radius:99px;padding:2px 9px;border:0.5px solid transparent;transition:border-color 0.15s;margin-top:0;}
 .replay-link:hover{border-color:var(--color-text-info);}
+
 .tbl-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem;}
 table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
 thead tr{background:var(--color-background-secondary);}
@@ -134,10 +148,6 @@ td select.player-cell:focus{background:var(--color-background-info);}
 .list-item:last-child{border-bottom:none;}
 .list-body{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
 .list-id{color:var(--color-text-primary);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.list-memo{color:var(--color-text-secondary);font-size:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.no-data{text-align:center;padding:3rem 0;}
-.no-data i{font-size:32px;color:var(--color-text-secondary);}
-.no-data p{font-size:14px;color:var(--color-text-secondary);margin-top:8px;}
 .info-box{background:var(--color-background-info);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:12px;color:var(--color-text-info);margin-bottom:1rem;line-height:1.6;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;z-index:9999;white-space:nowrap;}
 .toast-show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -413,7 +423,6 @@ function decomposeHangul(str) {
 }
 
 // ─── 된소리 확장 매핑 ─────────────────────────────────────────────
-// 예사소리로 검색하면 된소리도 포함, 된소리로 검색하면 된소리만
 const TENSED_MAP = {
   'ㄱ': ['ㄱ','ㄲ'],
   'ㄷ': ['ㄷ','ㄸ'],
@@ -422,19 +431,12 @@ const TENSED_MAP = {
   'ㅈ': ['ㅈ','ㅉ'],
 };
 
-// 검색어의 초성 자모를 된소리 포함 패턴으로 확장한 문자열들을 생성
-// 예: 'ㄱ' → ['ㄱ','ㄲ'], 'ㄲ' → ['ㄲ'] 만
-// 문자열 전체에 대해 모든 조합을 만들면 폭발적으로 늘어나므로
-// startsWith 방식 대신, 각 아이디의 decomposed와 쿼리를 문자 단위로 비교
 function matchesQuery(decomposedId, decomposedQuery) {
-  // decomposedQuery가 decomposedId의 접두어인지 확인
-  // 단, 쿼리의 각 자모에 대해 된소리 확장 적용
   if (decomposedQuery.length > decomposedId.length) return false;
   for (let i = 0; i < decomposedQuery.length; i++) {
     const qCh = decomposedQuery[i];
     const tCh = decomposedId[i];
     if (qCh === tCh) continue;
-    // 예사소리 쿼리 → 된소리 대상도 허용
     const expanded = TENSED_MAP[qCh];
     if (expanded && expanded.includes(tCh)) continue;
     return false;
@@ -457,9 +459,11 @@ function parseReplayHash(val) {
 function replayLinkHTML(replayHash, player) {
   if (!replayHash) return '';
   const href = MAFIA42_BASE + replayHash;
-  const tip  = player ? `${player}번 플레이어` : '';
-  const playerBadge = player ? `<span style="font-size:11px;font-weight:600">${player}</span>` : '';
-  return `<a href="${esc(href)}" target="_blank" rel="noopener" class="replay-link" ${tip ? `title="${esc(tip)}"` : ''}>${playerBadge}<i class="ti ti-player-play" aria-hidden="true" style="font-size:11px"></i> 리플보기</a>`;
+  const playerBadge = player
+    ? `<span style="font-size:11px;font-weight:600;margin-right:1px">${player}</span>`
+    : '';
+  const tip = player ? `${player}번 플레이어` : '';
+  return `<a href="${esc(href)}" target="_blank" rel="noopener" class="replay-link"${tip ? ` title="${esc(tip)}"` : ''}>${playerBadge}<i class="ti ti-player-play" aria-hidden="true" style="font-size:11px"></i> 리플보기</a>`;
 }
 
 function applyData(parsed, src) {
@@ -503,18 +507,6 @@ function updateStats() {
   document.getElementById('statTroll').textContent = data.length;
 }
 
-function trollMap() {
-  const m = {};
-  data.forEach(item => {
-    if (!item.id) return;
-    const k = item.id.toLowerCase();
-    const entry = { id: item.id, memo: item.memo, replay: item.replay||'', replayPlayer: item.replayPlayer||0 };
-    m[k] = entry;
-    if (item.decomposed && item.decomposed !== k) m[item.decomposed] = entry;
-  });
-  return m;
-}
-
 // ─── 검색 ─────────────────────────────────────────────────────────
 function doSearch() {
   const q = document.getElementById('searchInput').value.trim();
@@ -526,22 +518,36 @@ function doSearch() {
   const key = q.toLowerCase();
   const keyDecomp = decomposeHangul(key);
 
-  // 정확히 일치하는 항목
   const exactItem = data.find(i => i.id.toLowerCase() === key);
 
   if (exactItem) {
     const { id: origId, memo, replay, replayPlayer } = exactItem;
     const replayHtml = replayLinkHTML(replay, replayPlayer);
-    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div>${replayHtml}</div></div>`;
+    const memoText = memo ? esc(memo) : '메모 없음';
+    resultEl.innerHTML = `<div class="result-card">
+      <div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+      <div>
+        <div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div>
+        <div class="r-meta">
+          <span class="r-memo-text">${memoText}</span>
+          ${replayHtml}
+        </div>
+      </div>
+    </div>`;
   } else {
-    // 된소리 확장 포함 유사 검색 (접두어 매칭)
     const similar = data.filter(i => {
       if (!i.id) return false;
       if (i.id.toLowerCase() === key) return false;
       const idDecomp = i.decomposed || decomposeHangul(i.id.toLowerCase());
       return matchesQuery(idDecomp, keyDecomp);
     });
-    resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div><div><div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div><div class="r-memo">등록된 트롤이 아닙니다</div></div></div>${similar.length?`<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>`:''}`;
+    resultEl.innerHTML = `<div class="result-card">
+      <div class="r-icon icon-clean"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+      <div>
+        <div class="r-id">${esc(q)} <span class="badge bs"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i> 정상</span></div>
+        <div class="r-meta"><span class="r-memo-text">등록된 트롤이 아닙니다</span></div>
+      </div>
+    </div>${similar.length ? `<div class="section-label" style="margin-top:1rem">유사한 아이디 (${similar.length}개)</div><div class="list-wrap">${similar.map(listItemHTML).join('')}</div>` : ''}`;
   }
 }
 
@@ -558,12 +564,17 @@ function renderList() {
 
 function listItemHTML(item) {
   const replayHtml = replayLinkHTML(item.replay, item.replayPlayer);
-  const memoLine = item.memo ? esc(item.memo) : `<span style="color:var(--color-text-tertiary)">메모 없음</span>`;
+  const memoLine = item.memo
+    ? esc(item.memo)
+    : `<span style="color:var(--color-text-tertiary)">메모 없음</span>`;
   return `<div class="list-item">
     <i class="ti ti-ban" aria-hidden="true" style="font-size:15px;color:var(--color-text-danger);flex-shrink:0"></i>
     <div class="list-body">
       <div class="list-id">${esc(item.id)}</div>
-      <div class="list-memo">${memoLine}${replayHtml ? ' ' + replayHtml : ''}</div>
+      <div class="list-meta">
+        <span class="list-memo-text">${memoLine}</span>
+        ${replayHtml}
+      </div>
     </div>
   </div>`;
 }
@@ -621,7 +632,6 @@ function trimReplayInput(input) {
 function trimReplayCell(input, idx) {
   const hash = parseReplayHash(input.value);
   input.value = hash;
-  // replay 없으면 player도 0으로
   if (!hash && data[idx] && data[idx].replayPlayer) {
     data[idx].replayPlayer = 0;
     renderEditTable();
