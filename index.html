@@ -133,9 +133,9 @@ td input.url-cell{font-family:var(--font-mono);font-size:12px;color:var(--color-
 .section-label{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;}
 .list-wrap .list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:14px;}
 .list-item:last-child{border-bottom:none;}
-.list-id{flex:1;color:var(--color-text-primary);font-weight:500;}
-.list-memo{flex:2;color:var(--color-text-secondary);font-size:13px;}
-.list-replay{flex-shrink:0;}
+.list-body{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
+.list-id{color:var(--color-text-primary);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-memo{color:var(--color-text-secondary);font-size:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .no-data{text-align:center;padding:3rem 0;}
 .no-data i{font-size:32px;color:var(--color-text-secondary);}
 .no-data p{font-size:14px;color:var(--color-text-secondary);margin-top:8px;}
@@ -186,6 +186,10 @@ td input.url-cell{font-family:var(--font-mono);font-size:12px;color:var(--color-
       <input type="text" id="newId" placeholder="새 아이디" style="max-width:140px">
       <input type="text" id="newMemo" placeholder="메모 (선택)" style="max-width:160px">
       <input type="text" id="newUrl" placeholder="해시 또는 풀 URL" style="max-width:200px;font-family:var(--font-mono);font-size:12px" onblur="trimReplayInput(this)">
+      <select id="newPlayer" style="max-width:90px">
+        <option value="0">플레이어 -</option>
+        ${Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}번</option>`).join('')}
+      </select>
       <button onclick="addRow()"><i class="ti ti-plus" aria-hidden="true"></i> 추가</button>
       <button onclick="saveJSON()" id="saveBtn" style="margin-left:auto"><i class="ti ti-brand-github" aria-hidden="true"></i> GitHub에 저장</button>
     </div>
@@ -193,16 +197,18 @@ td input.url-cell{font-family:var(--font-mono);font-size:12px;color:var(--color-
       <table>
         <colgroup>
           <col style="width:44px">
-          <col style="width:26%">
-          <col style="width:26%">
+          <col style="width:24%">
+          <col style="width:24%">
           <col>
+          <col style="width:72px">
           <col style="width:48px">
         </colgroup>
         <thead><tr>
           <th></th>
           <th>아이디</th>
           <th>메모</th>
-          <th>URL</th>
+          <th>리플 해시</th>
+          <th style="text-align:center">플레이어</th>
           <th></th>
         </tr></thead>
         <tbody id="editTbody"></tbody>
@@ -411,10 +417,14 @@ function parseReplayHash(val) {
   return '';
 }
 
-function replayLinkHTML(replayHash) {
+function replayLinkHTML(replayHash, player) {
   if (!replayHash) return '';
   const href = MAFIA42_BASE + replayHash;
-  return `<a href="${esc(href)}" target="_blank" rel="noopener" class="replay-link"><i class="ti ti-player-play" aria-hidden="true" style="font-size:11px"></i> 리플보기</a>`;
+  const tip  = player ? `${player}번 플레이어` : '';
+  const playerBadge = player
+    ? `<span class="replay-player">${player}</span>`
+    : '';
+  return `<a href="${esc(href)}" target="_blank" rel="noopener" class="replay-link" ${tip ? `title="${esc(tip)}"` : ''}>${playerBadge}<i class="ti ti-player-play" aria-hidden="true" style="font-size:11px"></i> 리플보기</a>`;
 }
 
 function applyData(parsed, src) {
@@ -423,7 +433,7 @@ function applyData(parsed, src) {
     const id = String(item.id||'').trim();
     // 기존 url 필드도 호환 (풀 URL이어도 해시 추출)
     const rawReplay = item.replay || item.url || '';
-    return { id, memo: item.memo||'', replay: parseReplayHash(rawReplay), decomposed: decomposeHangul(id.toLowerCase()) };
+    return { id, memo: item.memo||'', replay: parseReplayHash(rawReplay), replayPlayer: item.replayPlayer||0, decomposed: decomposeHangul(id.toLowerCase()) };
   });
   document.getElementById('statSrc').innerHTML = src;
   updateStats();
@@ -458,7 +468,7 @@ function trollMap() {
   data.forEach(item => {
     if (!item.id) return;
     const k = item.id.toLowerCase();
-    const entry = { id: item.id, memo: item.memo, replay: item.replay||'' };
+    const entry = { id: item.id, memo: item.memo, replay: item.replay||'', replayPlayer: item.replayPlayer||0 };
     m[k] = entry;
     if (item.decomposed && item.decomposed !== k) m[item.decomposed] = entry;
   });
@@ -476,8 +486,8 @@ function doSearch() {
   const keyDecomp = decomposeHangul(key);
   const hitKey = map.hasOwnProperty(key) ? key : map.hasOwnProperty(keyDecomp) ? keyDecomp : null;
   if (hitKey) {
-    const { id: origId, memo, replay } = map[hitKey];
-    const replayHtml = replayLinkHTML(replay);
+    const { id: origId, memo, replay, replayPlayer } = map[hitKey];
+    const replayHtml = replayLinkHTML(replay, replayPlayer);
     resultEl.innerHTML = `<div class="result-card"><div class="r-icon icon-troll"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div><div class="r-id">${esc(origId)} <span class="badge bd"><i class="ti ti-ban" style="font-size:11px" aria-hidden="true"></i> 트롤</span></div><div class="r-memo">${memo?esc(memo):'메모 없음'}</div>${replayHtml}</div></div>`;
   } else {
     const keyDecomposed = decomposeHangul(key);
@@ -503,8 +513,15 @@ function renderList() {
 }
 
 function listItemHTML(item) {
-  const replayHtml = replayLinkHTML(item.replay);
-  return `<div class="list-item"><i class="ti ti-ban" aria-hidden="true" style="font-size:15px;color:var(--color-text-danger);flex-shrink:0"></i><span class="list-id">${esc(item.id)}</span><span class="list-memo">${item.memo?esc(item.memo):'<span style="color:var(--color-text-tertiary)">메모 없음</span>'}</span>${replayHtml?`<span class="list-replay">${replayHtml}</span>`:''}</div>`;
+  const replayHtml = replayLinkHTML(item.replay, item.replayPlayer);
+  const memoLine = item.memo ? esc(item.memo) : `<span style="color:var(--color-text-tertiary)">메모 없음</span>`;
+  return `<div class="list-item">
+    <i class="ti ti-ban" aria-hidden="true" style="font-size:15px;color:var(--color-text-danger);flex-shrink:0"></i>
+    <div class="list-body">
+      <div class="list-id">${esc(item.id)}</div>
+      <div class="list-memo">${memoLine}${replayHtml ? ' ' + replayHtml : ''}</div>
+    </div>
+  </div>`;
 }
 
 function renderEditTable() {
