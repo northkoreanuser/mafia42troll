@@ -1,5 +1,11 @@
 [
   {
+    "id": "감태철태",
+    "memo": "팀킬",
+    "replay": "89af5f3ab099a6357675212fdf90e8ee",
+    "replayPlayer": 6
+  },
+  {
     "id": "오빅3",
     "memo": "친플"
   },
@@ -346,11 +352,5 @@
   {
     "id": "꼽을게",
     "memo": "게임 안끝내는 빌런"
-  },
-  {
-    "id": "감태철태",
-    "memo": "팀킬",
-    "replay": "89af5f3ab099a6357675212fdf90e8ee",
-    "replayPlayer": 6
   }
 ]
