@@ -303,9 +303,7 @@
   },
   {
     "id": "용감한남",
-    "memo": "도배충 + 트롤 판사",
-    "replay": "f789b28450db821e6d4a689de1142c04",
-    "replayPlayer": 11
+    "memo": "도배충"
   },
   {
     "id": "리본스리본",
@@ -618,5 +616,11 @@
     "memo": "트롤",
     "replay": "e85e71678369d438fdc27d11e778a7d1",
     "replayPlayer": 1
+  },
+  {
+    "id": "하뚱찌",
+    "memo": "교팀인데 고의트롤",
+    "replay": "fad7f076a4171bb707788c11ba3b9fa2",
+    "replayPlayer": 12
   }
 ]
