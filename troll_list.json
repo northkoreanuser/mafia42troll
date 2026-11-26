@@ -674,5 +674,23 @@
     "memo": "고의패배",
     "replay": "e54d853bc3008a034eae6da8afade92e",
     "replayPlayer": 9
+  },
+  {
+    "id": "포대장윤가놈",
+    "memo": "도배",
+    "replay": "331d29961b834ef96009f565538562d8",
+    "replayPlayer": 7
+  },
+  {
+    "id": "이승원보지",
+    "memo": "도배",
+    "replay": "331d29961b834ef96009f565538562d8",
+    "replayPlayer": 8
+  },
+  {
+    "id": "레헬루",
+    "memo": "트롤",
+    "replay": "331d29961b834ef96009f565538562d8",
+    "replayPlayer": 12
   }
 ]
